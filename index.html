@@ -566,16 +566,9 @@
       <input type="text" class="modal-input" id="modalArtist" placeholder="Artist name" autocomplete="off">
     </div>
     <div class="modal-field">
-      <label>Section</label>
-      <select class="modal-input" id="modalSection">
-        <option value="">Auto (based on type)</option>
-        <option value="album">Favorites (Album)</option>
-        <option value="playlist">Favorites (Playlist)</option>
-        <option value="single">Favorites (Single)</option>
-        <option value="sleep-music">Sleep</option>
-        <option value="hypnosis">Hypnosis</option>
-        <option value="holiday">Holiday (in Other)</option>
-        <option value="affirmation">Affirmation (in Other)</option>
+      <label>Category</label>
+      <select class="modal-input" id="modalCategory">
+        <option value="">Select a category...</option>
       </select>
     </div>
     <div class="modal-field">
@@ -620,9 +613,20 @@
   <div class="modal">
     <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:20px">
       <h3 style="margin:0">⚙︎ Settings</h3>
-      <span style="font-size:0.72rem;color:var(--dim)">v1.5</span>
+      <span style="font-size:0.72rem;color:var(--dim)">v2.0</span>
     </div>
     <div id="settingsContent" style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px">
+      <!-- Categories Management -->
+      <div style="padding:12px;background:var(--card2);border-radius:10px">
+        <h4 style="margin:0 0 10px 0;font-size:13px;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:0.5px">Categories</h4>
+        <div id="categoriesList" style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px"></div>
+        <div style="display:flex;gap:8px">
+          <input type="text" id="newCategoryInput" placeholder="New category name" class="modal-input" style="flex:1;padding:10px;font-size:14px" autocomplete="off">
+          <button onclick="addCategory()" style="padding:10px 16px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-weight:600;cursor:pointer;flex-shrink:0">+</button>
+        </div>
+      </div>
+
+      <!-- Export/Import -->
       <div style="display:flex;gap:10px">
         <button class="modal-btn cancel" onclick="exportData()" style="flex:1">📥 Export</button>
         <button class="modal-btn cancel" onclick="document.getElementById('importFile').click()" style="flex:1">📤 Import</button>
@@ -632,8 +636,9 @@
     </div>
     <div id="helpContent" style="display:none;margin-bottom:20px;padding:16px;background:var(--card2);border-radius:12px;font-size:13px;line-height:1.6;color:var(--text)">
       <h4 style="margin:0 0 10px 0;color:var(--accent)">Music Favorites Guide</h4>
-      <p style="margin:0 0 8px 0"><strong>Add Entry:</strong> Tap the + button to add albums, playlists, or singles. Rate them 1-5 stars.</p>
-      <p style="margin:0 0 8px 0"><strong>Filter:</strong> Use the filter buttons to view by rating, type, or special categories (Holiday, Hypnosis, Sleep).</p>
+      <p style="margin:0 0 8px 0"><strong>Categories:</strong> Manage your categories in Settings. Each item must belong to a category (Sleep, Workout, Chill, Focus, etc.).</p>
+      <p style="margin:0 0 8px 0"><strong>Add Entry:</strong> Tap the + button to add items. Choose a category and rate items 1-5 stars.</p>
+      <p style="margin:0 0 8px 0"><strong>Organization:</strong> Items are grouped by category, then by star rating (5-Star, 4-Star, etc.).</p>
       <p style="margin:0 0 8px 0"><strong>Search:</strong> Search by artist or title. Tap ✕ to clear.</p>
       <p style="margin:0 0 8px 0"><strong>Edit:</strong> Tap any entry to edit or delete. Drag to reorder (edit mode).</p>
       <p style="margin:0 0 8px 0"><strong>Sections:</strong> Tap headers to collapse/expand. Use Expand All / Collapse All buttons.</p>
@@ -663,158 +668,8 @@
 
 <script>
 // ─── DATA ────────────────────────────────────────────────────────────────────
-const DATA = [
-
-  // ── MUSIC · PLAYLISTS ──────────────────────────────────────────────────────
-  { section:'music', type:'playlist', artist:'Various',       title:'Classic Rock | Top 100 Songs',    year:null, rating:4, isNew:false, toReview:false },
-  { section:'music', type:'playlist', artist:'Roosevelt',     title:'Roosevelt: Top Songs',            year:null, rating:4, isNew:false, toReview:false },
-  { section:'music', type:'playlist', artist:'Vandelux',      title:'Vandelux: Top Songs',             year:null, rating:4, isNew:false, toReview:false },
-  { section:'music', type:'playlist', artist:'Ivan Gough',    title:'Ivan Gough: Top Songs',           year:null, rating:4, isNew:false, toReview:false },
-  { section:'music', type:'playlist', artist:'Tina Mark',     title:'DNC 2024 Roll Call',              year:2022, rating:4, isNew:false, toReview:false },
-  { section:'music', type:'playlist', artist:'Heart',         title:'Heart: Top Songs',                year:null, rating:4, isNew:false, toReview:false },
-  { section:'music', type:'playlist', artist:'Chappell Roan', title:'Chappell Roan Essentials',        year:null, rating:4, isNew:false, toReview:false },
-  { section:'music', type:'playlist', artist:'Various',       title:'Music from Shrinking Season 2',   year:2024, rating:3, isNew:true,  toReview:false },
-  { section:'music', type:'playlist', artist:'Nat King Cole', title:'Nat "King" Cole Essentials',      year:null, rating:3, isNew:false, toReview:false },
-  { section:'music', type:'playlist', artist:'Ariana Grande', title:'Ariana Grande Top Songs',         year:null, rating:4, isNew:false, toReview:false },
-  { section:'music', type:'playlist', artist:'Various',       title:"Early 90's Dance",                year:null, rating:2, isNew:false, toReview:false },
-
-  // ── MUSIC · ALBUMS · NEW ───────────────────────────────────────────────────
-  { section:'music', type:'album', artist:'Bad Bunny',         title:'DeBÍ TiRAR MáS FOTOS',                      year:2025, rating:4, isNew:true, toReview:false },
-  { section:'music', type:'album', artist:'Gorillaz',          title:'The Mountain',                              year:2026, rating:4, isNew:true, toReview:false },
-  { section:'music', type:'album', artist:'Mumford & Sons',    title:'Prizefighter',                              year:2026, rating:4, isNew:true, toReview:false },
-  { section:'music', type:'album', artist:'Mumford & Sons',    title:'Apple Music Sessions',                      year:2026, rating:4, isNew:true, toReview:false },
-  { section:'music', type:'album', artist:'Neko Case',         title:'Neon Grey Midnight Green',                  year:2025, rating:0, isNew:true, toReview:true },
-  { section:'music', type:'album', artist:'Sarah McLachlan',   title:'Better Broken',                             year:2025, rating:0, isNew:true, toReview:true },
-  { section:'music', type:'album', artist:'Fink',              title:'Bloom Innocent - Acoustic',                 year:2020, rating:0, isNew:true, toReview:true },
-  { section:'music', type:'album', artist:'sombr',             title:'in another life',                           year:2023, rating:0, isNew:true, toReview:true },
-  { section:'music', type:'album', artist:'sombr',             title:'I Barely Know Her',                         year:2025, rating:0, isNew:true, toReview:true },
-
-  // ── MUSIC · ALBUMS · RATED ─────────────────────────────────────────────────
-  { section:'music', type:'album', artist:'LEISURE',                    title:'Welcome to the Mood',                           year:2025, rating:4, isNew:false, toReview:false },
-  { section:'music', type:'album', artist:'Tutankhamun',                title:'Tutankhamen',                                   year:2022, rating:4, isNew:false, toReview:false },
-  { section:'music', type:'album', artist:'Gleka',                      title:'Deep Impressions; Vol. 3 (DJ Mix)',              year:2025, rating:4, isNew:false, toReview:false },
-  { section:'music', type:'album', artist:'Tame Impala',                title:'Deadbeat',                                      year:2025, rating:4, isNew:false, toReview:false },
-  { section:'music', type:'album', artist:'Tom Basden & Carey Mulligan',title:'The Ballad of Wallis Island (Original ST)',      year:2025, rating:4, isNew:false, toReview:false },
-  { section:'music', type:'album', artist:'Maggie Rogers',              title:"Don't Forget Me",                               year:2024, rating:4, isNew:false, toReview:false },
-  { section:'music', type:'album', artist:'Miley Cyrus',                title:'Something Beautiful',                           year:2025, rating:4, isNew:false, toReview:false },
-  { section:'music', type:'album', artist:'Miley Cyrus',                title:'Endless Summer Vacation',                       year:2023, rating:4, isNew:false, toReview:false },
-  { section:'music', type:'album', artist:'The Reds, Pinks & Purples',  title:'Still Clouds At Noon',                          year:2024, rating:4, isNew:false, toReview:false },
-  { section:'music', type:'album', artist:'The Reds, Pinks & Purples',  title:'You Might Be Happy Someday',                    year:2020, rating:4, isNew:false, toReview:false },
-  { section:'music', type:'album', artist:'Cigarettes After Sex',        title:"X's",                                           year:2024, rating:4, isNew:false, toReview:false },
-  { section:'music', type:'album', artist:'Cigarettes After Sex',        title:'Cigarettes After Sex',                          year:2017, rating:4, isNew:false, toReview:false },
-  { section:'music', type:'album', artist:'Cigarettes After Sex',        title:'Cry',                                           year:2019, rating:4, isNew:false, toReview:false },
-  { section:'music', type:'album', artist:'Tom Odell',                   title:'Black Friday',                                  year:2024, rating:4, isNew:false, toReview:false },
-  { section:'music', type:'album', artist:'Tom Odell',                   title:'Best Day of My Life',                           year:2022, rating:4, isNew:false, toReview:false },
-  { section:'music', type:'album', artist:'Tom Odell',                   title:'A Wonderful Life',                              year:2025, rating:4, isNew:false, toReview:false },
-  { section:'music', type:'album', artist:'Orville Peck',                title:'Bronco',                                        year:2022, rating:4, isNew:false, toReview:false },
-  { section:'music', type:'album', artist:'Orville Peck',                title:'Stampede',                                      year:2024, rating:4, isNew:false, toReview:false },
-  { section:'music', type:'album', artist:'Orville Peck',                title:'Appaloosa',                                     year:2025, rating:4, isNew:false, toReview:false },
-  { section:'music', type:'album', artist:'Billie Eilish',               title:'HIT ME HARD AND SOFT',                          year:2024, rating:4, isNew:false, toReview:false, special:'✨' },
-  { section:'music', type:'album', artist:'Billie Eilish',               title:'What Was I Made For?',                          year:2023, rating:4, isNew:false, toReview:false },
-  { section:'music', type:'album', artist:'AIR',                         title:'Talkie Walkie',                                 year:2004, rating:4, isNew:false, toReview:false },
-  { section:'music', type:'album', artist:'BECK',                        title:'Morning Phase',                                 year:2014, rating:4, isNew:false, toReview:false },
-  { section:'music', type:'album', artist:'M83',                         title:"Hurry Up We're Dreaming",                       year:2011, rating:4, isNew:false, toReview:false },
-  { section:'music', type:'album', artist:'Supertramp',                  title:'Breakfast In America (Remastered)',              year:1979, rating:4, isNew:false, toReview:false },
-  { section:'music', type:'album', artist:'Boston',                      title:'Boston',                                        year:1976, rating:4, isNew:false, toReview:false },
-  { section:'music', type:'album', artist:'Cat Stevens',                 title:'Greatest Hits',                                 year:1975, rating:4, isNew:false, toReview:false },
-  { section:'music', type:'album', artist:'The Smashing Pumpkins',       title:'Siamese Dream',                                 year:1993, rating:4, isNew:false, toReview:false },
-  { section:'music', type:'album', artist:'Brian Eno & Beattie Wolfe',   title:'Luminal',                                       year:2025, rating:4, isNew:false, toReview:false },
-  { section:'music', type:'album', artist:'Diana Ross',                  title:'Supertonic: Mixes',                             year:2020, rating:4, isNew:false, toReview:false },
-  { section:'music', type:'album', artist:'Beach Fossils',               title:'Bunny',                                         year:2023, rating:4, isNew:false, toReview:false },
-  { section:'music', type:'album', artist:'Andrea Bocelli',              title:'Romanza',                                       year:1996, rating:4, isNew:false, toReview:false },
-  { section:'music', type:'album', artist:'Chappell Roan',               title:'The Rise and Fall of a Midwest Princess',       year:2023, rating:4, isNew:false, toReview:false },
-  { section:'music', type:'album', artist:'The Fauns',                   title:'How Lost',                                      year:2024, rating:4, isNew:false, toReview:false },
-  { section:'music', type:'album', artist:'A Flock of Seagulls',         title:'A Flock of Seagulls',                           year:1982, rating:4, isNew:false, toReview:false },
-  { section:'music', type:'album', artist:'Tears for Fears',             title:'Songs For A Nervous Planet',                    year:2024, rating:4, isNew:false, toReview:false },
-  { section:'music', type:'album', artist:'Paul Russell',                title:'again sometime?',                               year:2024, rating:3, isNew:false, toReview:false },
-  { section:'music', type:'album', artist:'Radiohead',                   title:'OK Computer',                                   year:1997, rating:3, isNew:false, toReview:false },
-  { section:'music', type:'album', artist:'Sufjan Stevens',              title:'Carrie & Lowell',                               year:2015, rating:3, isNew:false, toReview:false },
-  { section:'music', type:'album', artist:'Cut Copy',                    title:'Moments',                                       year:2025, rating:2, isNew:false, toReview:false },
-  { section:'music', type:'album', artist:'The Postal Service',          title:'Give Up (10th Anniversary Deluxe Edition)',      year:2003, rating:2, isNew:false, toReview:false },
-  { section:'music', type:'album', artist:'Dave Matthews Band',          title:'Under the Table and Dreaming',                  year:1994, rating:2, isNew:false, toReview:false },
-  { section:'music', type:'album', artist:'Pretenders',                  title:'The Isle of View (Live)',                       year:1995, rating:2, isNew:false, toReview:false },
-  { section:'music', type:'album', artist:'Jon Hopkins',                 title:'Opalescent',                                    year:1999, rating:2, isNew:false, toReview:false },
-  { section:'music', type:'album', artist:'Lady Gaga',                   title:'MAYHEM',                                        year:2025, rating:2, isNew:false, toReview:false },
-  { section:'music', type:'album', artist:'Sabrina Carpenter',           title:"Short n' Sweet",                                year:2024, rating:2, isNew:false, toReview:false },
-  { section:'music', type:'album', artist:'Bleachers',                   title:'A Stranger Desired',                            year:2024, rating:2, isNew:false, toReview:false },
-  { section:'music', type:'album', artist:'A Flock of Seagulls',         title:'Him',                                           year:2024, rating:2, isNew:false, toReview:false, url:'https://music.apple.com/us/album/him/1781786030?i=1781786037' },
-  { section:'music', type:'album', artist:'SYML',                        title:'The Day My Father Died',                        year:2023, rating:1, isNew:false, toReview:false },
-  { section:'music', type:'album', artist:'Steve Winwood',               title:'Chronicles',                                    year:1987, rating:1, isNew:false, toReview:false },
-  { section:'music', type:'album', artist:'Parks, Squares and Alleys',   title:'Against Illusions and Reality',                 year:2015, rating:1, isNew:false, toReview:false },
-  { section:'music', type:'album', artist:'Heaven 17',                   title:'The Luxury Gap (Deluxe Version)',               year:1983, rating:1, isNew:false, toReview:false },
-
-  // ── MUSIC · SINGLES ────────────────────────────────────────────────────────
-  { section:'music', type:'single', artist:'Underworld',   title:'Born Slippy (Nuxx / Remastered)',                              year:1996, rating:0, isNew:false, toReview:false },
-  { section:'music', type:'single', artist:'Celine Dion',  title:"Hymne à l'amour (Live from the Olympic Games Paris 2024)",    year:2024, rating:0, isNew:false, toReview:false },
-
-  // ── MUSIC · HOLIDAY ────────────────────────────────────────────────────────
-  { section:'music', type:'holiday', artist:'Cher',    title:'Cher Christmas',  year:2023, rating:4, isNew:false, toReview:false },
-  { section:'music', type:'holiday', artist:'Various', title:"80's Christmas",  year:null, rating:3, isNew:false, toReview:false },
-
-  // ── MUSIC · NOT YET RATED ──────────────────────────────────────────────────
-  { section:'music', type:'album', artist:'Leon Bridges',  title:'Leon',                                         year:2024, rating:0, isNew:false, toReview:false },
-  { section:'music', type:'album', artist:'Glass Beams',   title:'Mahal (EP)',                                   year:2024, rating:0, isNew:false, toReview:false },
-  { section:'music', type:'album', artist:'Glass Beams',   title:'Mirage (EP)',                                  year:2021, rating:0, isNew:false, toReview:false },
-  { section:'music', type:'album', artist:'Jon Batiste',   title:'Hollywood African',                            year:2018, rating:0, isNew:false, toReview:false },
-  { section:'music', type:'album', artist:'Ari Hest',      title:'The Treehouse Project - Year One',             year:2024, rating:0, isNew:false, toReview:false },
-  { section:'music', type:'album', artist:'Tycho',         title:'Infinite Health',                              year:2024, rating:0, isNew:false, toReview:false },
-  { section:'music', type:'album', artist:'Tycho',         title:'Where You Are (EP)',                           year:2024, rating:0, isNew:false, toReview:false },
-  { section:'music', type:'album', artist:'Fleetwood Mac', title:"Mirage Tour '82",                              year:2024, rating:0, isNew:false, toReview:false },
-  { section:'music', type:'album', artist:'Lady Gaga',     title:'Harlequin',                                    year:2024, rating:0, isNew:false, toReview:false },
-  { section:'music', type:'album', artist:'Cher',          title:'Forever',                                      year:2024, rating:0, isNew:false, toReview:false },
-  { section:'music', type:'album', artist:'U2',            title:'ZOO TV (Live in Dublin 1993)',                  year:2024, rating:0, isNew:false, toReview:false },
-  { section:'music', type:'album', artist:'Almost Vinyl',  title:'Fools Golden',                                 year:2024, rating:0, isNew:false, toReview:false },
-  { section:'music', type:'album', artist:'Jon Hopkins',   title:'Early Hours (DJ Mix)',                          year:2024, rating:0, isNew:false, toReview:false },
-  { section:'music', type:'album', artist:'Jon Hopkins',   title:'RITUAL',                                       year:2024, rating:0, isNew:false, toReview:false },
-  { section:'music', type:'album', artist:'Nico Muhly',    title:'Pachinko Season 1 (Apple TV+ Original ST)',    year:2024, rating:0, isNew:false, toReview:false },
-  { section:'music', type:'album', artist:'Moby',          title:'Play & Play: B Sides',                         year:2000, rating:0, isNew:false, toReview:false },
-  { section:'music', type:'playlist', artist:'Various',    title:'Oldies Volume 2',                              year:null, rating:0, isNew:false, toReview:false },
-
-  // ── POSITIVE · AFFIRMATIONS ───────────────────────────────────────────────
-  { section:'positive', type:'affirmation', artist:'Trinity Affirmations', title:'Positive Self Talk',              year:2016, rating:0, isNew:true, toReview:false },
-  { section:'positive', type:'affirmation', artist:'Trinity Affirmations', title:'Love Yourself',                   year:2016, rating:0, isNew:true, toReview:false },
-  { section:'positive', type:'affirmation', artist:'Trinity Affirmations', title:'Overcome Fear of Failure',        year:2016, rating:0, isNew:true, toReview:false },
-  { section:'positive', type:'affirmation', artist:'Trinity Affirmations', title:'Leadership Skills',               year:2016, rating:0, isNew:true, toReview:false },
-  { section:'positive', type:'affirmation', artist:'Trinity Affirmations', title:'Management Skills',               year:2016, rating:0, isNew:true, toReview:false },
-  { section:'positive', type:'affirmation', artist:'Trinity Affirmations', title:'Win Friends and Influence People',year:2016, rating:0, isNew:true, toReview:false },
-  { section:'positive', type:'affirmation', artist:'Trinity Affirmations', title:'Improve Communication Skills',    year:2016, rating:0, isNew:true, toReview:false },
-  { section:'positive', type:'affirmation', artist:'Trinity Affirmations', title:'Back Pain',                       year:2016, rating:0, isNew:true, toReview:false },
-  { section:'positive', type:'affirmation', artist:'Trinity Affirmations', title:'Insomnia',                        year:2016, rating:0, isNew:true, toReview:false },
-  { section:'positive', type:'affirmation', artist:'Trinity Affirmations', title:'Happy Relationship',              year:2016, rating:0, isNew:true, toReview:false },
-  { section:'positive', type:'affirmation', artist:'Trinity Affirmations', title:'Be a Better Listener',            year:2016, rating:0, isNew:true, toReview:false },
-  { section:'positive', type:'affirmation', artist:'Trinity Affirmations', title:'Smile More',                      year:2016, rating:0, isNew:true, toReview:false },
-
-  // ── SLEEP · HYPNOSIS ──────────────────────────────────────────────────────
-  { section:'sleep', type:'hypnosis', sleepRating:4, artist:'Various',               title:'Deep Sleep: Body & Mind Healing with Binaural Beats',                     year:null, rating:4, isNew:false, toReview:false },
-  { section:'sleep', type:'hypnosis', sleepRating:4, artist:'Joel Thielke',          title:'Super Confidence and Self-Esteem Boost with Hypnosis & Meditation',       year:2019, rating:4, isNew:false, toReview:false },
-  { section:'sleep', type:'hypnosis', sleepRating:4, artist:'Michael Sealey',        title:'Sleep Hypnosis: Let Go of Negative Attachments & Rebuild Confidence',     year:2019, rating:0, isNew:false, toReview:false },
-  { section:'sleep', type:'hypnosis', sleepRating:4, artist:'Michael Sealey',        title:'Sleep Hypnosis: Fall Asleep Fast (Circadian Reset for Deep Sleep)',       year:2019, rating:0, isNew:false, toReview:false },
-  { section:'sleep', type:'hypnosis', sleepRating:4, artist:'Michael Sealey',        title:'Sleep Meditation: Fall Asleep Fast Deep Healing',                         year:2020, rating:0, isNew:false, toReview:false },
-  { section:'sleep', type:'hypnosis', sleepRating:4, artist:'Anna Thompson',         title:'Hypnosis for Pain Relief and Mind Body Healing',                          year:2011, rating:0, isNew:false, toReview:false },
-  { section:'sleep', type:'hypnosis', sleepRating:4, artist:'Anna Thompson',         title:'Self Confidence and Charisma',                                            year:2011, rating:0, isNew:false, toReview:false },
-  { section:'sleep', type:'hypnosis', sleepRating:4, artist:'Anna Thompson',         title:'Zen Healing | Hypnosis With Binaural & Solfeggio',                        year:null, rating:0, isNew:false, toReview:false },
-  { section:'sleep', type:'hypnosis', sleepRating:5, artist:'Hypnosis Healing',      title:'Deep Sleep Healing For Relaxation and Recovery',                          year:2018, rating:0, isNew:false, toReview:false },
-  { section:'sleep', type:'hypnosis', sleepRating:0, artist:'Joel Thielke',          title:'Overcoming Imposter Syndrome Hypnosis and Subliminal',                    year:2024, rating:0, isNew:true,  toReview:true },
-  { section:'sleep', type:'hypnosis', sleepRating:1, artist:'Healing Meditation Zone',title:'Deep Sleep Hypnosis: Calming Quiet Nature Sounds',                      year:2016, rating:0, isNew:false, toReview:false },
-  { section:'sleep', type:'hypnosis', sleepRating:1, artist:'Various',               title:'Subliminal Self-Healing: Slim Forever for Men',                           year:null, rating:0, isNew:false, toReview:false },
-  { section:'sleep', type:'hypnosis', sleepRating:1, artist:'Various',               title:'Psychic Healing Subliminal Hypnosis',                                     year:null, rating:0, isNew:false, toReview:false },
-  { section:'sleep', type:'hypnosis', sleepRating:1, artist:'Delilah Helton',        title:'Lose Belly Fat & Imagine a Slim Tummy - Guided Imagery',                  year:2017, rating:0, isNew:false, toReview:false },
-  { section:'sleep', type:'hypnosis', sleepRating:1, artist:'Anna Thompson',         title:'Pain Relief and Mind Body Healing',                                        year:2011, rating:0, isNew:false, toReview:false },
-  { section:'sleep', type:'hypnosis', sleepRating:1, artist:'Delilah Helton',        title:'Journey into Your Dreams - Guided Imagery',                               year:2018, rating:0, isNew:false, toReview:false },
-  { section:'sleep', type:'hypnosis', sleepRating:1, artist:'Michael Sealey',        title:'Sleep Hypnosis: Lucid Dreaming Travels',                                  year:2016, rating:0, isNew:false, toReview:false },
-
-  // ── SLEEP · MUSIC ─────────────────────────────────────────────────────────
-  { section:'sleep', type:'sleep-music', sleepRating:4, icon:'🪲', artist:'Cricket',               title:'Cricket Sounds & Sleep Crickets',     year:2022, rating:4, isNew:false, toReview:false },
-  { section:'sleep', type:'sleep-music', sleepRating:4, icon:'🎻', artist:'Pablo Ferrández',        title:'Moonlight aVariation',               year:2025, rating:4, isNew:false, toReview:false },
-  { section:'sleep', type:'sleep-music', sleepRating:5, icon:'❄️', artist:'Oliver Coates',          title:'Pillion (Original Soundtrack)',       year:2025, rating:4, isNew:false, toReview:false },
-  { section:'sleep', type:'sleep-music', sleepRating:4, icon:'💤', artist:'Noah Gersh',             title:'Ecotone / Heaven Here',              year:2025, rating:4, isNew:false, toReview:false },
-  { section:'sleep', type:'sleep-music', sleepRating:4, icon:'💤', artist:'Tutankhamun',            title:'Tutankhamen',                        year:2022, rating:0, isNew:false, toReview:false },
-  { section:'sleep', type:'sleep-music', sleepRating:4, icon:'💤', artist:'Tom Odell',              title:'Best Day of My Life',                year:2022, rating:4, isNew:false, toReview:false },
-  { section:'sleep', type:'sleep-music', sleepRating:4, icon:'💤', artist:'Cigarettes After Sex',   title:'Cigarettes After Sex',               year:2017, rating:4, isNew:false, toReview:false },
-  { section:'sleep', type:'sleep-music', sleepRating:1, icon:'💤', artist:'Cigarettes After Sex',   title:'Cry',                                year:2019, rating:4, isNew:false, toReview:false },
-  { section:'sleep', type:'sleep-music', sleepRating:1, icon:'💤', artist:'Gleka',                  title:'Deep Impressions; Vol. 3 (DJ Mix)',  year:2025, rating:4, isNew:false, toReview:false },
-  { section:'sleep', type:'sleep-music', sleepRating:1, icon:'💤', artist:'Tony Scott',             title:'Music for Zen Meditation',           year:1964, rating:0, isNew:false, toReview:false },
-];
+// Empty by default - users add their own items
+const DATA = [];
 
 // ─── STATE ───────────────────────────────────────────────────────────────────
 let activeTab    = 'music';
@@ -823,7 +678,10 @@ let searchQuery  = '';
 let editMode     = false;
 let modal        = null;
 let data         = [];
+let categories   = [];
 const STORAGE_KEY = 'music_favorites_v1';
+const CATEGORIES_KEY = 'music_favorites_categories_v1';
+const DEFAULT_CATEGORIES = ['Sleep', 'Workout', 'Chill', 'Focus'];
 
 // ─── STORAGE ──────────────────────────────────────────────────────────────────
 function loadData() {
@@ -838,10 +696,29 @@ function loadData() {
   } catch(e) {
     data = JSON.parse(JSON.stringify(DATA));
   }
+  loadCategories();
 }
 
 function saveData() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+}
+
+function loadCategories() {
+  try {
+    const stored = localStorage.getItem(CATEGORIES_KEY);
+    if (stored) {
+      categories = JSON.parse(stored);
+    } else {
+      categories = JSON.parse(JSON.stringify(DEFAULT_CATEGORIES));
+      saveCategories();
+    }
+  } catch(e) {
+    categories = JSON.parse(JSON.stringify(DEFAULT_CATEGORIES));
+  }
+}
+
+function saveCategories() {
+  localStorage.setItem(CATEGORIES_KEY, JSON.stringify(categories));
 }
 
 // ─── FILTERS ─────────────────────────────────────────────────────────────────
@@ -900,25 +777,21 @@ function esc(s) {
 // ─── FILTER ITEMS ─────────────────────────────────────────────────────────────
 function filterItems() {
   return data.filter(item => {
-    if (item.section !== activeTab) return false;
-
+    // Search filter
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
       if (!item.title.toLowerCase().includes(q) && !item.artist.toLowerCase().includes(q)) return false;
     }
 
+    // Type/Rating filter
     switch (activeFilter) {
       case 'all':         return true;
-      case '4star':       return item.rating === 4;
       case 'new':         return item.isNew && !item.toReview;
       case 'review':      return item.toReview;
       case 'unrated':     return item.rating === 0 && !item.toReview && !item.isNew;
       case 'album':       return item.type === 'album';
       case 'playlist':    return item.type === 'playlist';
       case 'single':      return item.type === 'single';
-      case 'holiday':     return item.type === 'holiday';
-      case 'hypnosis':    return item.type === 'hypnosis';
-      case 'sleep-music': return item.type === 'sleep-music';
       default:            return true;
     }
   });
@@ -928,16 +801,13 @@ function filterItems() {
 function renderCard(item, idx) {
   const icon  = item.icon || TYPE_ICON[item.type] || '🎵';
   const link  = musicLink(item);
-  const isSleep = item.section === 'sleep';
 
   const badges = [];
   if (item.isNew && !item.toReview) badges.push('<span class="badge badge-new">New</span>');
   if (item.toReview)                badges.push('<span class="badge badge-review">Review</span>');
   if (item.type !== 'album')        badges.push(`<span class="badge badge-${item.type}">${labelFor(item.type)}</span>`);
 
-  const ratingHtml = isSleep
-    ? `<span class="sleep-rating">${renderSleepDots(item.sleepRating)}</span>`
-    : `<span class="rating">${renderStars(item.rating)}</span>`;
+  const ratingHtml = `<span class="rating">${renderStars(item.rating)}</span>`;
 
   const yearHtml = item.year ? `<span class="card-year">${item.year}</span>` : '';
 
@@ -986,175 +856,44 @@ function render() {
   }
 
   const showGrouped = activeFilter === 'all' && !searchQuery;
-  const isAlbumFilter = activeFilter === 'album' && !searchQuery;
-  const hasGroupedSections = (showGrouped || isAlbumFilter) && activeTab === 'music';
+  const hasGroupedSections = showGrouped;
   document.getElementById('collapseControls').style.display = hasGroupedSections ? 'flex' : 'none';
   let html = `<div class="count-label">${items.length} item${items.length !== 1 ? 's' : ''}</div>`;
 
-  if ((showGrouped || isAlbumFilter) && activeTab === 'music') {
-    const isAlbumView = !items.some(i => i.type !== 'album');
-
-    if (isAlbumView) {
-      // Group albums by rating (Favorites first, then 4-1)
-      const groups = [
-        { label:'⭐ Favorites',      fn: i => i.rating === 5 },
-        { label:'★★★★ 4 Stars',   fn: i => i.rating === 4 },
-        { label:'★★★ 3 Stars',    fn: i => i.rating === 3 },
-        { label:'★★ 2 Stars',     fn: i => i.rating === 2 },
-        { label:'★ 1 Star',       fn: i => i.rating === 1 },
-      ];
-      for (const g of groups) {
-        const sub = sortItems(items.filter(g.fn));
-        if (!sub.length) continue;
-        const sectionId = 'sec-' + g.label.replace(/\W/g, '');
-        const cards = sub.map((item, i) => renderCard(item, data.indexOf(item))).join('');
-        html += `<div class="section-label" onclick="toggleSection('${sectionId}')">${g.label}</div>`;
-        html += `<div class="section-body" id="${sectionId}">${cards}</div>`;
-      }
-    } else {
-      // New grouping: Favorites + Holiday + Hypnosis + Sleep + Miscellaneous
-
-      const typeIcons = { playlist: '📋', album: '💿', single: '📻', hypnosis: '🌀', 'sleep-music': '🎶', affirmation: '💬' };
-      const ratingGroups = [
-        { label: '★★★ 3 Stars', fn: i => i.rating === 3 },
-        { label: '★★ 2 Stars', fn: i => i.rating === 2 },
-        { label: '★ 1 Star', fn: i => i.rating === 1 }
-      ];
-
-      let html_sections = '';
-
-      // 1. New (items marked as new)
-      const newItems = items.filter(i => i.isNew && !i.toReview);
-      const newId = 'sec-New';
-      html_sections += `<div class="section-label section-main" onclick="toggleSection('${newId}')">New<span class="chevron">›</span></div>`;
-      let newContent = '';
-      for (const rg of ratingGroups) {
-        const sub = sortItems(newItems.filter(rg.fn));
-        if (!sub.length) continue;
-        const subId = newId + '-' + rg.label.replace(/\W/g, '');
-        const cards = sub.map((item, i) => renderCard(item, data.indexOf(item))).join('');
-        newContent += `<div class="sub-section-label" onclick="toggleSection('${subId}')">${rg.label}</div>`;
-        newContent += `<div class="section-body" id="${subId}">${cards}</div>`;
-      }
-      html_sections += `<div class="section-body collapsed" id="${newId}">${newContent || '<div style="padding:10px;color:var(--dim);font-size:12px">Empty</div>'}</div>`;
-
-      // 2. Favorites (1-3 stars, excluding special types) with rating sub-groups
-      const favorites = items.filter(i => i.rating >= 1 && i.rating <= 3 && i.type !== 'holiday' && i.type !== 'hypnosis' && i.type !== 'sleep-music' && !i.isNew);
-      const favId = 'sec-Favorites';
-      html_sections += `<div class="section-label section-main" onclick="toggleSection('${favId}')">Favorites<span class="chevron">›</span></div>`;
-      let favContent = '';
-      for (const rg of ratingGroups) {
-        const sub = sortItems(favorites.filter(rg.fn));
-        if (!sub.length) continue;
-        const subId = favId + '-' + rg.label.replace(/\W/g, '');
-        const cards = sub.map((item, i) => renderCard(item, data.indexOf(item))).join('');
-        favContent += `<div class="sub-section-label" onclick="toggleSection('${subId}')">${rg.label}</div>`;
-        favContent += `<div class="section-body" id="${subId}">${cards}</div>`;
-      }
-      html_sections += `<div class="section-body" id="${favId}">${favContent || '<div style="padding:10px;color:var(--dim);font-size:12px">Empty</div>'}</div>`;
-
-      // 3. Sleep (type=sleep-music, 1-3 stars) with rating sub-groups
-      const sleepItems = items.filter(i => i.type === 'sleep-music' && i.rating >= 1 && i.rating <= 3);
-      const sleepId = 'sec-Sleep';
-      html_sections += `<div class="section-label section-main" onclick="toggleSection('${sleepId}')">Sleep<span class="chevron">›</span></div>`;
-      let sleepContent = '';
-      for (const rg of ratingGroups) {
-        const sub = sortItems(sleepItems.filter(rg.fn));
-        if (!sub.length) continue;
-        const subId = sleepId + '-' + rg.label.replace(/\W/g, '');
-        const cards = sub.map((item, i) => renderCard(item, data.indexOf(item))).join('');
-        sleepContent += `<div class="sub-section-label" onclick="toggleSection('${subId}')">${rg.label}</div>`;
-        sleepContent += `<div class="section-body" id="${subId}">${cards}</div>`;
-      }
-      html_sections += `<div class="section-body" id="${sleepId}">${sleepContent || '<div style="padding:10px;color:var(--dim);font-size:12px">Empty</div>'}</div>`;
-
-      // 4. Hypnosis (type=hypnosis, 1-3 stars) with rating sub-groups
-      const hypnosisItems = items.filter(i => i.type === 'hypnosis' && i.rating >= 1 && i.rating <= 3);
-      const hypId = 'sec-Hypnosis';
-      html_sections += `<div class="section-label section-main" onclick="toggleSection('${hypId}')">Hypnosis<span class="chevron">›</span></div>`;
-      let hypContent = '';
-      for (const rg of ratingGroups) {
-        const sub = sortItems(hypnosisItems.filter(rg.fn));
-        if (!sub.length) continue;
-        const subId = hypId + '-' + rg.label.replace(/\W/g, '');
-        const cards = sub.map((item, i) => renderCard(item, data.indexOf(item))).join('');
-        hypContent += `<div class="sub-section-label" onclick="toggleSection('${subId}')">${rg.label}</div>`;
-        hypContent += `<div class="section-body" id="${subId}">${cards}</div>`;
-      }
-      html_sections += `<div class="section-body" id="${hypId}">${hypContent || '<div style="padding:10px;color:var(--dim);font-size:12px">Empty</div>'}</div>`;
-
-      // 5. Other (everything else not in above categories, including Holiday)
-      const otherItems = items.filter(i => i.rating !== 5 && i.type !== 'hypnosis' && i.type !== 'sleep-music' && !i.isNew);
-      const otherId = 'sec-Other';
-      html_sections += `<div class="section-label section-main" onclick="toggleSection('${otherId}')">Other<span class="chevron">›</span></div>`;
-      let otherContent = '';
-
-      const typeMap = {};
-      for (const item of otherItems) {
-        const t = item.type;
-        if (!typeMap[t]) typeMap[t] = [];
-        typeMap[t].push(item);
-      }
-
-      const typeSorted = Object.keys(typeMap).sort();
-      for (const type of typeSorted) {
-        const typeItems = typeMap[type];
-        const ratedItems = typeItems.filter(i => i.rating >= 1 && i.rating <= 3);
-        const unratedItems = typeItems.filter(i => i.rating === 0 && !i.isNew && !i.toReview);
-        const reviewItems = typeItems.filter(i => i.toReview);
-
-        if (ratedItems.length) {
-          const typeId = otherId + '-' + type;
-          const icon = typeIcons[type] || '🎵';
-          const label = type.charAt(0).toUpperCase() + type.slice(1).replace('-', ' ');
-          otherContent += `<div class="sub-section-label" onclick="toggleSection('${typeId}')">${icon} ${label}</div>`;
-          let typeContent = '';
-          for (const rg of ratingGroups) {
-            const sub = sortItems(ratedItems.filter(rg.fn));
-            if (!sub.length) continue;
-            const subId = typeId + '-' + rg.label.replace(/\W/g, '');
-            const cards = sub.map((item, i) => renderCard(item, data.indexOf(item))).join('');
-            typeContent += `<div class="sub-section-label" onclick="toggleSection('${subId}')">${rg.label}</div>`;
-            typeContent += `<div class="section-body" id="${subId}">${cards}</div>`;
-          }
-          otherContent += `<div class="section-body" id="${typeId}">${typeContent}</div>`;
-        }
-
-        if (unratedItems.length) {
-          const unratedId = otherId + '-unrated-' + type;
-          const cards = sortItems(unratedItems).map((item, i) => renderCard(item, data.indexOf(item))).join('');
-          otherContent += `<div class="sub-section-label" onclick="toggleSection('${unratedId}')">☁️ Unrated</div>`;
-          otherContent += `<div class="section-body" id="${unratedId}">${cards}</div>`;
-        }
-
-        if (reviewItems.length) {
-          const reviewId = otherId + '-review-' + type;
-          const cards = sortItems(reviewItems).map((item, i) => renderCard(item, data.indexOf(item))).join('');
-          otherContent += `<div class="sub-section-label" onclick="toggleSection('${reviewId}')">❓ Review</div>`;
-          otherContent += `<div class="section-body" id="${reviewId}">${cards}</div>`;
-        }
-      }
-
-      html_sections += `<div class="section-body" id="${otherId}">${otherContent}</div>`;
-
-      // Add all sections with headers and bodies interleaved
-      html += html_sections;
-    }
-  } else if (showGrouped && activeTab === 'sleep') {
-    const groups = [
-      { label:'🌀 Hypnosis',     fn: i => i.type === 'hypnosis' },
-      { label:'🎶 Sleep Music',  fn: i => i.type === 'sleep-music' },
+  if (showGrouped) {
+    // Group by user-created categories, then by rating within each category
+    const ratingGroups = [
+      { label: '⭐ Five (5)', fn: i => i.rating === 5 },
+      { label: '⭐ Four (4)', fn: i => i.rating === 4 },
+      { label: '⭐ Three (3)', fn: i => i.rating === 3 },
+      { label: '⭐ Two (2)', fn: i => i.rating === 2 },
+      { label: '⭐ One (1)', fn: i => i.rating === 1 },
+      { label: '☁️ No Rating', fn: i => i.rating === 0 }
     ];
-    for (const g of groups) {
-      const sub = sortItems(items.filter(g.fn));
-      if (!sub.length) continue;
-      const sectionId = 'sec-' + g.label.replace(/\W/g, '');
-      const cards = sub.map((item, i) => renderCard(item, data.indexOf(item))).join('');
-      html += `<div class="section-label" onclick="toggleSection('${sectionId}')">${g.label}</div>`;
-      html += `<div class="section-body" id="${sectionId}">${cards}</div>`;
+
+    // For each category, show items organized by rating
+    for (const cat of categories) {
+      const catItems = items.filter(i => i.category === cat);
+      if (!catItems.length) continue;
+
+      const catId = 'cat-' + cat.replace(/\W/g, '');
+      html += `<div class="section-label section-main" onclick="toggleSection('${catId}')">${esc(cat)}<span class="chevron">›</span></div>`;
+
+      let catContent = '';
+      for (const rg of ratingGroups) {
+        const sub = sortItems(catItems.filter(rg.fn));
+        if (!sub.length) continue;
+        const subId = catId + '-' + rg.label.replace(/\W/g, '');
+        const cards = sub.map((item) => renderCard(item, data.indexOf(item))).join('');
+        catContent += `<div class="sub-section-label" onclick="toggleSection('${subId}')">${rg.label}</div>`;
+        catContent += `<div class="section-body" id="${subId}">${cards}</div>`;
+      }
+
+      html += `<div class="section-body collapsed" id="${catId}">${catContent}</div>`;
     }
   } else {
-    html += sortItems(items).map((item, i) => renderCard(item, data.indexOf(item))).join('');
+    // Show items in simple list (when searching or filtering)
+    html += sortItems(items).map((item) => renderCard(item, data.indexOf(item))).join('');
   }
 
   el.innerHTML = html;
@@ -1234,12 +973,19 @@ function clearSearch() {
 }
 
 // ─── MODAL FUNCTIONS ─────────────────────────────────────────────────────────
+function populateCategoryDropdown() {
+  const select = document.getElementById('modalCategory');
+  select.innerHTML = '<option value="">Select a category...</option>' +
+    categories.map(cat => `<option value="${esc(cat)}">${esc(cat)}</option>`).join('');
+}
+
 function openAddModal() {
   modal = { isNew: true };
   document.getElementById('modalHeading').textContent = 'Add Entry';
   document.getElementById('modalTitle').value = '';
   document.getElementById('modalArtist').value = '';
-  document.getElementById('modalSection').value = '';
+  populateCategoryDropdown();
+  document.getElementById('modalCategory').value = '';
   document.getElementById('modalType').value = 'album';
   document.getElementById('modalYear').value = '';
   document.getElementById('modalRating').value = '4';
@@ -1256,13 +1002,8 @@ function openEditModal(idx) {
   document.getElementById('modalHeading').textContent = 'Edit Entry';
   document.getElementById('modalTitle').value = item.title;
   document.getElementById('modalArtist').value = item.artist;
-
-  const sectionField = document.getElementById('modalSection');
-  if (item.type === 'sleep-music') sectionField.value = 'sleep-music';
-  else if (item.type === 'hypnosis') sectionField.value = 'hypnosis';
-  else if (item.type === 'holiday') sectionField.value = 'holiday';
-  else sectionField.value = '';
-
+  populateCategoryDropdown();
+  document.getElementById('modalCategory').value = item.category || '';
   document.getElementById('modalType').value = item.type;
   document.getElementById('modalYear').value = item.year || '';
   document.getElementById('modalRating').value = item.rating || '0';
@@ -1278,6 +1019,7 @@ function closeModal() {
 }
 
 function openSettingsModal() {
+  renderCategoriesList();
   document.getElementById('settingsOverlay').classList.add('show');
 }
 
@@ -1289,6 +1031,39 @@ function closeSettingsModal() {
 function toggleHelp() {
   const help = document.getElementById('helpContent');
   help.style.display = help.style.display === 'none' ? 'block' : 'none';
+}
+
+// ─── CATEGORY MANAGEMENT ─────────────────────────────────────────────────────
+function renderCategoriesList() {
+  const list = document.getElementById('categoriesList');
+  list.innerHTML = categories.map((cat, idx) => `
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:8px;background:var(--bg);border-radius:8px;font-size:14px">
+      <span>${esc(cat)}</span>
+      <button onclick="deleteCategory(${idx})" style="background:rgba(255,69,58,0.15);color:var(--red);border:none;padding:6px 10px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer">Delete</button>
+    </div>
+  `).join('');
+  document.getElementById('newCategoryInput').value = '';
+}
+
+function addCategory() {
+  const input = document.getElementById('newCategoryInput');
+  const name = input.value.trim();
+  if (!name) return;
+  if (categories.includes(name)) {
+    alert('This category already exists');
+    return;
+  }
+  categories.push(name);
+  saveCategories();
+  renderCategoriesList();
+}
+
+function deleteCategory(idx) {
+  if (confirm(`Delete category "${categories[idx]}"?`)) {
+    categories.splice(idx, 1);
+    saveCategories();
+    renderCategoriesList();
+  }
 }
 
 // ─── DRAG & DROP ──────────────────────────────────────────────────────────────
@@ -1337,20 +1112,21 @@ function cardDrop(e) {
 function saveEntry() {
   const title = document.getElementById('modalTitle').value.trim();
   const artist = document.getElementById('modalArtist').value.trim();
+  const category = document.getElementById('modalCategory').value.trim();
   const type = document.getElementById('modalType').value;
   const year = document.getElementById('modalYear').value ? parseInt(document.getElementById('modalYear').value) : null;
   const rating = parseInt(document.getElementById('modalRating').value) || 0;
   const isNew = document.getElementById('modalNew').checked;
   const url = document.getElementById('modalUrl').value.trim() || null;
 
-  if (!title || !artist) {
-    alert('Title and artist are required');
+  if (!title || !artist || !category) {
+    alert('Title, artist, and category are required');
     return;
   }
 
   if (modal.isNew) {
     const newItem = {
-      section: activeTab || 'music',
+      category,
       type,
       artist,
       title,
@@ -1365,6 +1141,7 @@ function saveEntry() {
     const item = data[modal.idx];
     item.title = title;
     item.artist = artist;
+    item.category = category;
     item.type = type;
     item.year = year;
     item.rating = rating;
@@ -1426,10 +1203,16 @@ function importData(event) {
   event.target.value = '';
 }
 
-// ─── MODAL SECTION HANDLER ────────────────────────────────────────────────────
-document.getElementById('modalSection').addEventListener('change', function() {
-  if (this.value) {
-    document.getElementById('modalType').value = this.value;
+// ─── MODAL HANDLERS ───────────────────────────────────────────────────────────
+// Allow Enter key to add new category from input field
+document.addEventListener('DOMContentLoaded', function() {
+  const catInput = document.getElementById('newCategoryInput');
+  if (catInput) {
+    catInput.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        addCategory();
+      }
+    });
   }
 });
 

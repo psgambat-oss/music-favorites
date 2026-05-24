@@ -1,5 +1,17 @@
 # Music Favorites — Changelog
 
+## v2.0 — 2026-05-24
+- **Complete rebuild: User-created categories instead of hardcoded sections**
+  - Removed hardcoded song data (app starts empty)
+  - Users now create their own categories (Sleep, Workout, Chill, Focus, etc.)
+  - Added Category Management in Settings (create, delete categories)
+  - Items organized by category, then by star rating (5-Star, 4-Star, etc.)
+  - Updated data model: items now use `category` field
+- Simplified render logic for cleaner, more maintainable code
+- Updated Help guide to reflect new category-based organization
+- Generic app template ready to share with other users
+- All data remains private in localStorage (no server-side storage)
+
 ## v1.6 — 2026-05-24
 - Reorganized section order: New, Favorites, Sleep, Hypnosis, Other
 - Renamed "Miscellaneous" section to "Other" (includes Holiday items)
