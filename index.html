@@ -1111,7 +1111,9 @@ function renderFilters() {
       if (category) {
         const filterValue = 'cat:' + category;
         const isActive = activeFilter === filterValue ? ' active' : '';
-        buttons.push(`<button class="chip${isActive}" onclick="setFilter('${filterValue}')">${esc(category)}</button>`);
+        // Escape the filterValue for safe use in onclick attribute
+        const safeFilterValue = filterValue.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        buttons.push(`<button class="chip${isActive}" onclick="setFilter(&quot;${safeFilterValue}&quot;)">${esc(category)}</button>`);
       }
     }
   }
