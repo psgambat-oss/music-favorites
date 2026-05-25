@@ -1559,7 +1559,7 @@ function validateCSVRow(row, lineNum) {
     artist: row.artist || '',
     title: row.title || '',
     category: row.category || '',
-    type: row.type || 'album',
+    type: (row.type || 'album').toLowerCase(),  // Normalize to lowercase
     year: row.year ? parseInt(row.year) : null,
     rating: row.rating ? parseInt(row.rating) : 0,
     url: row.url || null,
