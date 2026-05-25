@@ -1604,9 +1604,15 @@ function validateCSVRow(row, lineNum) {
   if (!item.title) errors.push(`Line ${lineNum}: Title is required`);
   if (!item.category) errors.push(`Line ${lineNum}: Category is required`);
 
-  // Validate category exists
-  if (item.category && !categories.includes(item.category)) {
-    errors.push(`Line ${lineNum}: Category "${item.category}" does not exist`);
+  // Validate category exists (case-insensitive)
+  if (item.category) {
+    const categoryExists = categories.some(cat => cat.toLowerCase() === item.category.toLowerCase());
+    if (!categoryExists) {
+      errors.push(`Line ${lineNum}: Category "${item.category}" does not exist`);
+    } else {
+      // Normalize to match app's category case
+      item.category = categories.find(cat => cat.toLowerCase() === item.category.toLowerCase());
+    }
   }
 
   // Validate type
