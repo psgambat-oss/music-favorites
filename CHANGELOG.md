@@ -1,5 +1,22 @@
 # My Music Library — Changelog
 
+## v2.2 — 2026-05-25
+- **Card layout redesign**
+  - Reorganized card display: Title, Year • Rating, Artist on separate rows
+  - Eliminates text wrapping for long titles
+  - Improved readability and visual hierarchy
+- **Star rating display throughout**
+  - Gray star (★) displays after all rating labels
+  - Ratings shown as "FOUR (4) ★" in cards, section headers, and dialog
+  - Added dynamic rating preview in Add/Edit modal
+- **CSV import improvements**
+  - Proper CSV parser handles quoted fields with commas (e.g., artist names like "The Reds, Pinks, and Purples")
+  - Case-insensitive category validation (GENERAL matches General)
+  - Skip instruction rows automatically when importing template
+- **Bug fixes**
+  - Filter Buttons now import/export correctly with bidirectional sync
+  - Type field normalized to lowercase (Album → album)
+
 ## v2.1 — 2026-05-25
 - **Renamed app: "Sound Vault" → "My Music Library"**
   - Updated app title, meta tags, and manifest

@@ -383,8 +383,15 @@
     .card-year {
       flex-shrink: 0;
       white-space: nowrap;
-      margin-left: 8px;
       color: var(--dim);
+    }
+
+    .card-meta-row {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--dim);
+      margin-top: 2px;
+      line-height: 1.3;
     }
 
     .card-meta { display: none; }
@@ -634,8 +641,9 @@
       <input type="number" class="modal-input" id="modalYear" placeholder="Leave empty if unknown" min="1900" max="2999">
     </div>
     <div class="modal-field">
-      <label>Rating (1-5 stars)</label>
-      <input type="number" class="modal-input" id="modalRating" placeholder="1-5" min="1" max="5" value="1">
+      <label>RATING (1-5 STARS ★)</label>
+      <input type="number" class="modal-input" id="modalRating" placeholder="1-5" min="1" max="5" value="1" onchange="updateRatingDisplay()">
+      <div id="ratingDisplay" style="font-size:13px;color:var(--dim);margin-top:6px;font-weight:500"></div>
     </div>
     <div class="modal-field">
       <label>Apple Music URL (optional)</label>
@@ -653,7 +661,7 @@
   <div class="modal" style="display:flex;flex-direction:column;max-height:85vh">
     <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:20px;flex-shrink:0">
       <h3 style="margin:0">⚙︎ Settings</h3>
-      <span style="font-size:0.72rem;color:var(--dim)">v2.1</span>
+      <span style="font-size:0.72rem;color:var(--dim)">v2.2</span>
     </div>
     <div id="settingsContent" style="display:flex;flex-direction:column;gap:16px;margin-bottom:20px;flex:1;overflow-y:auto">
       <!-- Categories Management -->
@@ -976,7 +984,11 @@ function filterItems() {
 function getRatingLabel(rating) {
   if (!rating) return '';
   const labels = ['', 'ONE (1)', 'TWO (2)', 'THREE (3)', 'FOUR (4)', 'FIVE (5)'];
-  return labels[rating] || '';
+  const label = labels[rating] || '';
+  if (label) {
+    return `${label} <span style="color:var(--dim)">★</span>`;
+  }
+  return '';
 }
 
 // ─── RENDER CARD ──────────────────────────────────────────────────────────────
@@ -990,14 +1002,15 @@ function renderCard(item, idx) {
 
   const ratingHtml = `<span class="rating">${renderStars(item.rating)}</span>`;
 
-  const yearHtml = item.year ? `<span class="card-year">• ${item.year}</span>` : '';
+  const yearHtml = item.year ? `<span class="card-year">${item.year}</span>` : '';
   const ratingLabel = getRatingLabel(item.rating);
-  const ratingTitleHtml = ratingLabel ? `<span class="card-year">• ${ratingLabel}</span>` : '';
+  const ratingTitleHtml = ratingLabel ? `<span class="card-year">${ratingLabel}</span>` : '';
 
   const cardContent = `
     <div class="card-icon">${icon}</div>
     <div class="card-body">
-      <div class="card-title">${esc(item.special || '')}${esc(item.title)}${yearHtml}${ratingTitleHtml}</div>
+      <div class="card-title">${esc(item.special || '')}${esc(item.title)}</div>
+      <div class="card-meta-row">${yearHtml}${yearHtml && ratingTitleHtml ? '<span class="card-year"> • </span>' : ''}${ratingTitleHtml}</div>
       <div class="card-artist">${esc(item.artist)}${topArtists.includes(item.artist) ? ' <span style="font-size:12px;color:var(--accent);margin-left:4px;opacity:0.7">★</span>' : ''}</div>
       <div class="card-meta">${badges.join('')}</div>
     </div>
@@ -1080,11 +1093,11 @@ function render() {
     } else {
       // Group by user-created categories, then by rating within each category
       const ratingGroups = [
-        { label: 'Five (5)', fn: i => i.rating === 5 },
-        { label: 'Four (4)', fn: i => i.rating === 4 },
-        { label: 'Three (3)', fn: i => i.rating === 3 },
-        { label: 'Two (2)', fn: i => i.rating === 2 },
-        { label: 'One (1)', fn: i => i.rating === 1 },
+        { label: 'Five (5) <span style="color:var(--dim)">★</span>', fn: i => i.rating === 5 },
+        { label: 'Four (4) <span style="color:var(--dim)">★</span>', fn: i => i.rating === 4 },
+        { label: 'Three (3) <span style="color:var(--dim)">★</span>', fn: i => i.rating === 3 },
+        { label: 'Two (2) <span style="color:var(--dim)">★</span>', fn: i => i.rating === 2 },
+        { label: 'One (1) <span style="color:var(--dim)">★</span>', fn: i => i.rating === 1 },
         { label: 'No Rating', fn: i => i.rating === 0 }
       ];
 
@@ -1297,6 +1310,18 @@ function openAddModal() {
   document.getElementById('modalUrl').value = '';
   document.getElementById('deleteBtn').style.display = 'none';
   document.getElementById('modalOverlay').classList.add('show');
+  updateRatingDisplay();
+}
+
+function updateRatingDisplay() {
+  const rating = parseInt(document.getElementById('modalRating').value) || 0;
+  const display = document.getElementById('ratingDisplay');
+  if (rating > 0) {
+    const label = getRatingLabel(rating);
+    display.innerHTML = label;
+  } else {
+    display.innerHTML = 'No Rating';
+  }
 }
 
 function openEditModal(idx) {
@@ -1314,6 +1339,7 @@ function openEditModal(idx) {
   document.getElementById('modalUrl').value = item.url || '';
   document.getElementById('deleteBtn').style.display = 'flex';
   document.getElementById('modalOverlay').classList.add('show');
+  updateRatingDisplay();
 }
 
 function closeModal() {
