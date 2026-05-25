@@ -1,11 +1,12 @@
-# CSV Import Format Guide
-# Required columns: Artist, Title, Category
-# Optional columns: Year, Type, Rating, Top Artist, URL
-# Type options: album, playlist, single, audio, other
-# Rating: 1-5 (leave blank for unrated)
-# Top Artist: enter "Yes" to mark as favorite, leave blank to skip
-# Category must already exist in your app (add categories in Settings first)
-Artist,Title,Year,Category,Type,Rating,Top Artist,URL
-Weyes Blood,Titanic Rising,2019,Sleep,album,5,Yes,https://music.apple.com/us/album/titanic-rising/1467954259
-Bon Iver,i i,2019,Sleep,album,4,,https://music.apple.com/us/album/i-i/1457971826
-The National,I Am Easy to Find,2019,Sleep,playlist,5,,https://music.apple.com/us/playlist/i-am-easy-to-find/pl.u-jV86bpUCBGRvvNd
+Artist,Title,Year,Category,Type,Rating,Top Artist,URL,,Instructions,
+Weyes Blood,Titanic Rising,2019,Sleep,album,5,Yes,https://music.apple.com/us/album/titanic-rising/1467954259,,Required Columns:,Artist; Title; Category
+Bon Iver,i i,2019,Sleep,album,4,,https://music.apple.com/us/album/i-i/1457971826,,Optional Columns:,Year; Type; Rating; Top Artist; URL
+The National,I Am Easy to Find,2019,Sleep,playlist,5,,https://music.apple.com/us/playlist/i-am-easy-to-find/pl.u-jV86bpUCBGRvvNd,,Type Options:,album; playlist; single; audio; other
+,,,,,,,,,Rating:,1-5 (leave blank for unrated)
+,,,,,,,,,Top Artist:,"Yes" to mark as favorite (leave blank to skip)
+,,,,,,,,,Categories:,Must already exist in app (add in Settings first)
+,,,,,,,,,,,
+,,,,,,,,,How to Use:,
+,,,,,,,,,1. Fill in your data,Replace the example rows with your own music entries
+,,,,,,,,,2. Save the file,Save as CSV format (Excel: File > Save As > Format: CSV UTF-8)
+,,,,,,,,,3. Import to app,Settings > CSV Import > Choose File > select your CSV file
