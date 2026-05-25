@@ -424,6 +424,7 @@
       align-items: flex-end;
       padding: 16px;
       padding-bottom: calc(16px + env(safe-area-inset-bottom));
+      pointer-events: auto;
     }
     .modal-overlay.show {
       display: flex;
@@ -434,6 +435,7 @@
       padding: 24px;
       width: 100%;
       max-width: 100%;
+      pointer-events: auto;
     }
     .modal h3 {
       font-size: 19px;
@@ -481,6 +483,7 @@
       font-weight: 700;
       cursor: pointer;
       text-align: center;
+      pointer-events: auto;
     }
     .modal-btn.cancel { background: var(--card2); color: var(--text); }
     .modal-btn.confirm { background: var(--accent); color: #fff; }
@@ -610,12 +613,12 @@
 </div>
 
 <div class="modal-overlay" id="settingsOverlay">
-  <div class="modal">
-    <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:20px">
+  <div class="modal" style="display:flex;flex-direction:column;max-height:85vh">
+    <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:20px;flex-shrink:0">
       <h3 style="margin:0">⚙︎ Settings</h3>
       <span style="font-size:0.72rem;color:var(--dim)">v2.0</span>
     </div>
-    <div id="settingsContent" style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px">
+    <div id="settingsContent" style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px;flex:1;overflow-y:auto">
       <!-- Categories Management -->
       <div style="padding:12px;background:var(--card2);border-radius:10px">
         <h4 style="margin:0 0 10px 0;font-size:13px;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:0.5px">Categories</h4>
@@ -626,27 +629,41 @@
         </div>
       </div>
 
-      <!-- Export/Import -->
-      <div style="display:flex;gap:10px">
-        <button class="modal-btn cancel" onclick="exportData()" style="flex:1">📥 Export</button>
-        <button class="modal-btn cancel" onclick="document.getElementById('importFile').click()" style="flex:1">📤 Import</button>
+      <!-- Button Configuration -->
+      <div style="padding:12px;background:var(--card2);border-radius:10px">
+        <h4 style="margin:0 0 10px 0;font-size:13px;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:0.5px">Filter Buttons</h4>
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:400;text-transform:none;letter-spacing:0;margin-bottom:12px">
+          <input type="checkbox" id="showAllButton" onchange="saveButtonConfig()" style="width:18px;height:18px;cursor:pointer">
+          <span>Show "All" button</span>
+        </label>
+        <div id="buttonConfigList" style="display:flex;flex-direction:column;gap:12px"></div>
       </div>
-      <button class="modal-btn cancel" onclick="toggleHelp()">❓ Help</button>
+    </div>
+
+    <!-- Footer: Action buttons (stays fixed at bottom, doesn't scroll) -->
+    <div style="flex-shrink:0;border-top:1px solid var(--border);padding-top:16px;display:flex;flex-direction:column;gap:10px">
+      <div style="display:flex;gap:10px">
+        <button class="modal-btn cancel" onclick="exportData(); return false;">📥 Export</button>
+        <button class="modal-btn cancel" onclick="document.getElementById('importFile').click(); return false;">📤 Import</button>
+      </div>
+      <button class="modal-btn cancel" onclick="toggleHelp(); return false;">❓ Help</button>
       <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
-    </div>
-    <div id="helpContent" style="display:none;margin-bottom:20px;padding:16px;background:var(--card2);border-radius:12px;font-size:13px;line-height:1.6;color:var(--text)">
-      <h4 style="margin:0 0 10px 0;color:var(--accent)">Music Favorites Guide</h4>
-      <p style="margin:0 0 8px 0"><strong>Categories:</strong> Manage your categories in Settings. Each item must belong to a category (Sleep, Workout, Chill, Focus, etc.).</p>
-      <p style="margin:0 0 8px 0"><strong>Add Entry:</strong> Tap the + button to add items. Choose a category and rate items 1-5 stars.</p>
-      <p style="margin:0 0 8px 0"><strong>Organization:</strong> Items are grouped by category, then by star rating (5-Star, 4-Star, etc.).</p>
-      <p style="margin:0 0 8px 0"><strong>Search:</strong> Search by artist or title. Tap ✕ to clear.</p>
-      <p style="margin:0 0 8px 0"><strong>Edit:</strong> Tap any entry to edit or delete. Drag to reorder (edit mode).</p>
-      <p style="margin:0 0 8px 0"><strong>Sections:</strong> Tap headers to collapse/expand. Use Expand All / Collapse All buttons.</p>
-      <p style="margin:0 0 8px 0"><strong>Export/Import:</strong> Backup your data anytime. Import from a previously exported file.</p>
-      <p style="margin:0"><strong>Tap any entry</strong> to open in Apple Music.</p>
-    </div>
-    <div class="modal-actions" style="margin-top:24px">
-      <button class="modal-btn confirm" onclick="closeSettingsModal()">Done</button>
+
+      <div id="helpContent" style="display:none;margin-top:12px;padding:12px;background:var(--card2);border-radius:12px;font-size:13px;line-height:1.6;color:var(--text)">
+        <h4 style="margin:0 0 10px 0;color:var(--accent)">Music Favorites Guide</h4>
+        <p style="margin:0 0 8px 0"><strong>Categories:</strong> Manage your categories in Settings. Each item must belong to a category (Sleep, Workout, Chill, Focus, etc.).</p>
+        <p style="margin:0 0 8px 0"><strong>Add Entry:</strong> Tap the + button to add items. Choose a category and rate items 1-5 stars.</p>
+        <p style="margin:0 0 8px 0"><strong>Organization:</strong> Items are grouped by category, then by star rating (5-Star, 4-Star, etc.).</p>
+        <p style="margin:0 0 8px 0"><strong>Search:</strong> Search by artist or title. Tap ✕ to clear.</p>
+        <p style="margin:0 0 8px 0"><strong>Edit:</strong> Tap any entry to edit or delete. Drag to reorder (edit mode).</p>
+        <p style="margin:0 0 8px 0"><strong>Sections:</strong> Tap headers to collapse/expand. Use Expand All / Collapse All buttons.</p>
+        <p style="margin:0 0 8px 0"><strong>Export/Import:</strong> Backup your data anytime. Import from a previously exported file.</p>
+        <p style="margin:0"><strong>Tap any entry</strong> to open in Apple Music.</p>
+      </div>
+
+      <div class="modal-actions" style="margin-top:12px">
+        <button class="modal-btn confirm" onclick="closeSettingsModal(); return false;">Done</button>
+      </div>
     </div>
   </div>
 </div>
@@ -677,10 +694,13 @@ let activeFilter = 'all';
 let searchQuery  = '';
 let editMode     = false;
 let modal        = null;
-let data         = [];
-let categories   = [];
+let data              = [];
+let categories        = [];
+let showAllButton      = true;
+let buttonConfigs      = []; // Array of {category, name} objects for filter buttons
 const STORAGE_KEY = 'music_favorites_v1';
 const CATEGORIES_KEY = 'music_favorites_categories_v1';
+const BUTTON_CONFIG_KEY = 'music_favorites_button_config_v1';
 const DEFAULT_CATEGORIES = ['Sleep', 'Workout', 'Chill', 'Focus'];
 
 // ─── STORAGE ──────────────────────────────────────────────────────────────────
@@ -697,6 +717,7 @@ function loadData() {
     data = JSON.parse(JSON.stringify(DATA));
   }
   loadCategories();
+  loadButtonConfig();
 }
 
 function saveData() {
@@ -719,6 +740,50 @@ function loadCategories() {
 
 function saveCategories() {
   localStorage.setItem(CATEGORIES_KEY, JSON.stringify(categories));
+}
+
+function loadButtonConfig() {
+  try {
+    const stored = localStorage.getItem(BUTTON_CONFIG_KEY);
+    if (stored) {
+      const config = JSON.parse(stored);
+      showAllButton = config.showAllButton !== false;
+      // Handle both old format (array of objects) and new format (array of strings)
+      if (Array.isArray(config.buttonConfigs)) {
+        buttonConfigs = config.buttonConfigs.map(item =>
+          typeof item === 'string' ? item : item.category
+        );
+      } else {
+        buttonConfigs = [];
+      }
+    } else {
+      showAllButton = true;
+      buttonConfigs = [];
+    }
+  } catch(e) {
+    showAllButton = true;
+    buttonConfigs = [];
+  }
+}
+
+function saveButtonConfig() {
+  showAllButton = document.getElementById('showAllButton').checked;
+
+  // Collect selected categories from all slots (no custom names)
+  buttonConfigs = [];
+  document.querySelectorAll('.button-slot-category').forEach(select => {
+    const category = select.value.trim();
+    if (category) {
+      buttonConfigs.push(category);
+    }
+  });
+
+  localStorage.setItem(BUTTON_CONFIG_KEY, JSON.stringify({
+    showAllButton,
+    buttonConfigs
+  }));
+
+  renderFilters();
 }
 
 // ─── FILTERS ─────────────────────────────────────────────────────────────────
@@ -781,6 +846,13 @@ function filterItems() {
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
       if (!item.title.toLowerCase().includes(q) && !item.artist.toLowerCase().includes(q)) return false;
+    }
+
+    // Category filter
+    if (activeFilter.startsWith('cat:')) {
+      const cat = activeFilter.substring(4);
+      if (item.category !== cat) return false;
+      return true;
     }
 
     // Type/Rating filter
@@ -855,7 +927,9 @@ function render() {
     return;
   }
 
-  const showGrouped = activeFilter === 'all' && !searchQuery;
+  // Show grouped view when: "All" filter is active AND no search AND not a category filter
+  const isCategoryFilter = activeFilter.startsWith('cat:');
+  const showGrouped = activeFilter === 'all' && !searchQuery && !isCategoryFilter;
   const hasGroupedSections = showGrouped;
   document.getElementById('collapseControls').style.display = hasGroupedSections ? 'flex' : 'none';
   let html = `<div class="count-label">${items.length} item${items.length !== 1 ? 's' : ''}</div>`;
@@ -891,8 +965,27 @@ function render() {
 
       html += `<div class="section-body collapsed" id="${catId}">${catContent}</div>`;
     }
+  } else if (isCategoryFilter) {
+    // Group by rating within the selected category
+    const ratingGroups = [
+      { label: '⭐ Five (5)', fn: i => i.rating === 5 },
+      { label: '⭐ Four (4)', fn: i => i.rating === 4 },
+      { label: '⭐ Three (3)', fn: i => i.rating === 3 },
+      { label: '⭐ Two (2)', fn: i => i.rating === 2 },
+      { label: '⭐ One (1)', fn: i => i.rating === 1 },
+      { label: '☁️ No Rating', fn: i => i.rating === 0 }
+    ];
+
+    for (const rg of ratingGroups) {
+      const sub = sortItems(items.filter(rg.fn));
+      if (!sub.length) continue;
+      const ratingId = 'rating-' + rg.label.replace(/\W/g, '');
+      const cards = sub.map((item) => renderCard(item, data.indexOf(item))).join('');
+      html += `<div class="sub-section-label" onclick="toggleSection('${ratingId}')">${rg.label}</div>`;
+      html += `<div class="section-body" id="${ratingId}">${cards}</div>`;
+    }
   } else {
-    // Show items in simple list (when searching or filtering)
+    // Show items in simple list (when searching or filtering by type)
     html += sortItems(items).map((item) => renderCard(item, data.indexOf(item))).join('');
   }
 
@@ -932,10 +1025,25 @@ function collapseAllSections() {
 
 // ─── FILTERS BAR ─────────────────────────────────────────────────────────────
 function renderFilters() {
-  const filters = FILTERS[activeTab] || [];
-  document.getElementById('filterRow').innerHTML = filters.map(f =>
-    `<button class="chip${f.id === activeFilter ? ' active' : ''}" onclick="setFilter('${f.id}')">${f.label}</button>`
-  ).join('');
+  let buttons = [];
+
+  // Add "All" button if enabled
+  if (showAllButton) {
+    buttons.push(`<button class="chip${activeFilter === 'all' ? ' active' : ''}" onclick="setFilter('all')">All</button>`);
+  }
+
+  // Add configured filter buttons (buttonConfigs is now just array of category names)
+  if (Array.isArray(buttonConfigs)) {
+    for (const category of buttonConfigs) {
+      if (category) {
+        const filterValue = 'cat:' + category;
+        const isActive = activeFilter === filterValue ? ' active' : '';
+        buttons.push(`<button class="chip${isActive}" onclick="setFilter('${filterValue}')">${esc(category)}</button>`);
+      }
+    }
+  }
+
+  document.getElementById('filterRow').innerHTML = buttons.join('');
 }
 
 // ─── TAB / FILTER SWITCH ──────────────────────────────────────────────────────
@@ -1020,6 +1128,7 @@ function closeModal() {
 
 function openSettingsModal() {
   renderCategoriesList();
+  renderButtonConfig();
   document.getElementById('settingsOverlay').classList.add('show');
 }
 
@@ -1056,6 +1165,7 @@ function addCategory() {
   categories.push(name);
   saveCategories();
   renderCategoriesList();
+  renderButtonConfig(); // Update button config dropdown when categories change
 }
 
 function deleteCategory(idx) {
@@ -1063,8 +1173,45 @@ function deleteCategory(idx) {
     categories.splice(idx, 1);
     saveCategories();
     renderCategoriesList();
+    renderButtonConfig(); // Update button config dropdown when categories change
   }
 }
+
+function renderButtonConfig() {
+  const container = document.getElementById('buttonConfigList');
+  document.getElementById('showAllButton').checked = showAllButton;
+
+  const MAX_SLOTS = 5;
+  const buttonArray = Array.isArray(buttonConfigs) ? buttonConfigs : [];
+
+  // Get assigned categories (simple string array now)
+  const assignedCategories = buttonArray.filter(c => c);
+
+  let html = '';
+  for (let i = 0; i < MAX_SLOTS; i++) {
+    const selectedCat = buttonArray[i] || '';
+
+    // Build dropdown options: show all categories except those assigned to other slots
+    const dropdownOptions = ['<option value="">-- Select category --</option>'];
+    for (const cat of categories) {
+      const isAssigned = assignedCategories.includes(cat) && cat !== selectedCat;
+      if (!isAssigned) {
+        dropdownOptions.push(`<option value="${esc(cat)}" ${selectedCat === cat ? 'selected' : ''}>${esc(cat)}</option>`);
+      }
+    }
+
+    html += `
+      <div style="padding:10px;background:var(--bg);border-radius:8px">
+        <select class="modal-input button-slot-category" data-slot="${i}" style="width:100%;padding:10px;font-size:13px" onchange="saveButtonConfig()">
+          ${dropdownOptions.join('')}
+        </select>
+      </div>
+    `;
+  }
+
+  container.innerHTML = html;
+}
+
 
 // ─── DRAG & DROP ──────────────────────────────────────────────────────────────
 let draggedIdx = null;
