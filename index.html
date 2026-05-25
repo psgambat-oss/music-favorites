@@ -673,6 +673,18 @@
         <h4 style="margin:0 0 10px 0;font-size:13px;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:0.5px">Top Artists</h4>
         <div id="topArtistsList" style="display:flex;flex-direction:column;gap:8px;max-height:200px;overflow-y:auto"></div>
       </div>
+
+      <!-- Import Artists -->
+      <div style="padding:12px;background:var(--card2);border-radius:10px">
+        <h4 style="margin:0 0 10px 0;font-size:13px;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:0.5px">Import Artists</h4>
+        <p style="font-size:12px;color:var(--dim);margin:0 0 10px 0">Paste artist names, one per line</p>
+        <textarea id="artistListInput" placeholder="Artist Name 1&#10;Artist Name 2&#10;Artist Name 3" style="width:100%;padding:10px;font-size:13px;background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:6px;font-family:monospace;min-height:80px;margin-bottom:10px;resize:none" autocomplete="off"></textarea>
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:400;text-transform:none;letter-spacing:0;margin-bottom:10px">
+          <span style="font-size:12px">Add to category:</span>
+          <select id="importCategorySelect" style="flex:1;padding:8px;background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:6px;font-size:12px"></select>
+        </label>
+        <button onclick="importArtistsList()" style="width:100%;padding:10px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-weight:600;cursor:pointer;font-size:13px">Import Artists</button>
+      </div>
     </div>
 
     <!-- Footer: Action buttons (stays fixed at bottom, doesn't scroll) -->
@@ -1301,6 +1313,7 @@ function openSettingsModal() {
   renderCategoriesList();
   renderButtonConfig();
   renderTopArtistsList();
+  populateImportCategoryDropdown();
   document.getElementById('settingsOverlay').classList.add('show');
 }
 
@@ -1422,6 +1435,82 @@ function toggleTopArtist(artistName, isChecked) {
     }
   }
   render(); // Re-render to show badge updates
+}
+
+function populateImportCategoryDropdown() {
+  const select = document.getElementById('importCategorySelect');
+  if (!select) return;
+
+  const defaultCategory = categories.length > 0 ? categories[0] : '';
+  let html = '';
+  for (const cat of categories) {
+    const selected = cat === defaultCategory ? 'selected' : '';
+    html += `<option value="${esc(cat)}" ${selected}>${esc(cat)}</option>`;
+  }
+  select.innerHTML = html;
+}
+
+function parseArtistList(text) {
+  return text
+    .split('\n')
+    .map(line => line.trim())
+    .filter(line => line.length > 0);
+}
+
+function importArtistsList() {
+  const textarea = document.getElementById('artistListInput');
+  const categorySelect = document.getElementById('importCategorySelect');
+
+  if (!textarea || !categorySelect) return;
+
+  const text = textarea.value.trim();
+  const selectedCategory = categorySelect.value;
+
+  if (!text) {
+    alert('Please enter at least one artist name');
+    return;
+  }
+
+  if (!selectedCategory) {
+    alert('Please select a category');
+    return;
+  }
+
+  const artistNames = parseArtistList(text);
+
+  if (artistNames.length === 0) {
+    alert('No valid artist names found');
+    return;
+  }
+
+  // Create items for each artist
+  let importedCount = 0;
+  for (const artistName of artistNames) {
+    const newItem = {
+      artist: artistName,
+      title: '',
+      category: selectedCategory,
+      type: 'album',
+      year: null,
+      rating: 0,
+      isNew: true,
+      toReview: false,
+      url: null,
+      isTopArtist: false,
+      sleepRating: 0
+    };
+    data.push(newItem);
+    importedCount++;
+  }
+
+  // Save and re-render
+  saveData();
+  closeSettingsModal();
+  render();
+  alert(`Imported ${importedCount} artist${importedCount !== 1 ? 's' : ''} to "${selectedCategory}". Edit each to add album details.`);
+
+  // Clear textarea for next import
+  textarea.value = '';
 }
 
 // ─── DRAG & DROP ──────────────────────────────────────────────────────────────
