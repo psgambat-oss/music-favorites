@@ -685,7 +685,7 @@
       <!-- Import from CSV -->
       <div style="padding:12px;background:var(--card2);border-radius:10px">
         <h4 style="margin:0 0 10px 0;font-size:13px;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:0.5px">Import from CSV</h4>
-        <p style="font-size:12px;color:var(--dim);margin:0 0 10px 0">Upload a CSV file with Artist, Title, Category, Type, Year, Rating, and URL columns.</p>
+        <p style="font-size:12px;color:var(--dim);margin:0 0 10px 0"><strong>Columns (in order):</strong> Artist, Title, Year, Category, Type, Rating, Top Artist, URL<br><strong>Required:</strong> Artist, Title, Category</p>
 
         <div style="display:flex;gap:8px;margin-bottom:12px">
           <button onclick="document.getElementById('csvImportFile').click()" style="flex:1;padding:10px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-weight:600;cursor:pointer;font-size:13px">📁 Choose CSV File</button>
@@ -712,7 +712,7 @@
           <h4 style="margin:0 0 8px 0;color:var(--accent);font-size:12px">Music Library Guide</h4>
           <p style="margin:0 0 6px 0"><strong>Categories:</strong> Manage your categories in Settings. Each item must belong to a category (Sleep, Workout, Chill, Focus, etc.).</p>
           <p style="margin:0 0 6px 0"><strong>Add Entry:</strong> Tap the + button to add items. Choose a category and rate items 1-5 stars.</p>
-          <p style="margin:0 0 6px 0"><strong>Bulk Import:</strong> Create a CSV spreadsheet with columns: Artist, Title, Category, Type, Year, Rating, URL. Download the template from Settings → "Import from CSV" and fill it in. Upload the CSV to import all items at once with full data populated.</p>
+          <p style="margin:0 0 6px 0"><strong>Bulk Import:</strong> Upload a CSV file to add multiple albums at once. Columns (in order): Artist, Title, Year, Category, Type, Rating, Top Artist, URL. Required: Artist, Title, Category. Download the template from Settings → "Import from CSV" to see the format and fill it in.</p>
           <p style="margin:0 0 6px 0"><strong>Organization:</strong> Items are grouped by category, then by star rating (5-Star, 4-Star, etc.).</p>
           <p style="margin:0 0 6px 0"><strong>Search:</strong> Search by artist or title. Tap ✕ to clear.</p>
           <p style="margin:0 0 6px 0"><strong>Edit:</strong> Tap any entry to edit or delete. Drag to reorder (edit mode).</p>
@@ -1463,7 +1463,7 @@ function populateImportCategoryDropdown() {
 }
 
 // ─── CSV IMPORT ───────────────────────────────────────────────────────────────
-const VALID_TYPES = ['album', 'playlist', 'single', 'holiday', 'hypnosis', 'sleep-music', 'affirmation'];
+const VALID_TYPES = ['album', 'playlist', 'single', 'audio', 'other'];
 
 function downloadTemplate() {
   const link = document.createElement('a');
@@ -1503,7 +1503,7 @@ function handleCSVImport(event) {
       const hasRequiredHeaders = requiredHeaders.every(h => headers.includes(h));
 
       if (!hasRequiredHeaders) {
-        alert(`CSV must have headers: ${requiredHeaders.join(', ')}`);
+        alert(`CSV must have headers: ${requiredHeaders.join(', ')}\n\nProper column order:\nArtist, Title, Year, Category, Type, Rating, Top Artist, URL`);
         return;
       }
 
@@ -1554,8 +1554,8 @@ function validateCSVRow(row, lineNum) {
     year: row.year ? parseInt(row.year) : null,
     rating: row.rating ? parseInt(row.rating) : 0,
     url: row.url || null,
+    isTopArtist: row['top artist'] && row['top artist'].toLowerCase() === 'yes',
     toReview: false,
-    isTopArtist: false,
     sleepRating: 0
   };
 
