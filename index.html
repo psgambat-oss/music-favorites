@@ -1613,7 +1613,18 @@ function confirmDelete() {
 
 // ─── EXPORT / IMPORT ──────────────────────────────────────────────────────────
 async function exportData() {
-  const dataStr = JSON.stringify(data, null, 2);
+  // Export both data and settings
+  const backup = {
+    version: 2,
+    items: data,
+    categories: categories,
+    buttonConfigs: buttonConfigs,
+    showAllButton: showAllButton,
+    topArtists: topArtists,
+    sortPreference: sortBy
+  };
+
+  const dataStr = JSON.stringify(backup, null, 2);
   const filename = `my-music-library-${new Date().toISOString().slice(0,10)}.json`;
   const blob = new Blob([dataStr], { type: 'application/json' });
   const file = new File([blob], filename, { type: 'application/json' });
@@ -1647,15 +1658,37 @@ function importData(event) {
   reader.onload = function(e) {
     try {
       const imported = JSON.parse(e.target.result);
+
+      // Handle both old format (array) and new format (object with settings)
       if (Array.isArray(imported)) {
+        // Old format: just items array
         data = imported;
         saveData();
-        render();
-        closeSettingsModal();
-        alert('Data imported successfully!');
+      } else if (typeof imported === 'object' && imported.version === 2) {
+        // New format: includes items + all settings
+        data = imported.items || [];
+        categories = imported.categories || [];
+        buttonConfigs = imported.buttonConfigs || [];
+        showAllButton = imported.showAllButton !== false;
+        topArtists = imported.topArtists || [];
+        sortBy = imported.sortPreference || 'rating';
+
+        // Save all settings to localStorage
+        saveData();
+        saveCategories();
+        saveButtonConfig();
+        saveTopArtists();
+        saveSortPreference();
       } else {
         alert('Invalid file format');
+        event.target.value = '';
+        return;
       }
+
+      render();
+      renderFilters();
+      closeSettingsModal();
+      alert('Data and settings imported successfully!');
     } catch(err) {
       alert('Error reading file: ' + err.message);
     }
