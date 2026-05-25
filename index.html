@@ -638,12 +638,6 @@
       <input type="number" class="modal-input" id="modalRating" placeholder="1-5" min="1" max="5" value="1">
     </div>
     <div class="modal-field">
-      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:400;text-transform:none;letter-spacing:0">
-        <input type="checkbox" id="modalNew" style="width:18px;height:18px;cursor:pointer">
-        Mark as New
-      </label>
-    </div>
-    <div class="modal-field">
       <label>Apple Music URL (optional)</label>
       <input type="url" class="modal-input" id="modalUrl" placeholder="https://music.apple.com/..." autocomplete="off">
     </div>
@@ -699,30 +693,34 @@
         </label>
         <button onclick="importArtistsList()" style="width:100%;padding:10px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-weight:600;cursor:pointer;font-size:13px">Import Artists</button>
       </div>
+
+      <!-- Export, Import, Help buttons (scrollable with content) -->
+      <div style="padding:12px;background:var(--card2);border-radius:10px">
+        <div style="display:flex;gap:10px;margin-bottom:10px">
+          <button class="modal-btn cancel" onclick="exportData(); return false;" style="flex:1">📥 Export</button>
+          <button class="modal-btn cancel" onclick="document.getElementById('importFile').click(); return false;" style="flex:1">📤 Import</button>
+        </div>
+        <button class="modal-btn cancel" onclick="toggleHelp(); return false;" style="width:100%;margin-bottom:10px">❓ Help</button>
+        <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
+
+        <div id="helpContent" style="display:none;margin-top:10px;padding:10px;background:var(--bg);border-radius:8px;font-size:12px;line-height:1.5;color:var(--text)">
+          <h4 style="margin:0 0 8px 0;color:var(--accent);font-size:12px">Music Library Guide</h4>
+          <p style="margin:0 0 6px 0"><strong>Categories:</strong> Manage your categories in Settings. Each item must belong to a category (Sleep, Workout, Chill, Focus, etc.).</p>
+          <p style="margin:0 0 6px 0"><strong>Add Entry:</strong> Tap the + button to add items. Choose a category and rate items 1-5 stars.</p>
+          <p style="margin:0 0 6px 0"><strong>Import Artists:</strong> In Settings, paste artist names (one per line) in the "Import Artists" section, select a category, and tap Import. Items are created as unrated entries — edit each one to add album title, year, and rating.</p>
+          <p style="margin:0 0 6px 0"><strong>Organization:</strong> Items are grouped by category, then by star rating (5-Star, 4-Star, etc.).</p>
+          <p style="margin:0 0 6px 0"><strong>Search:</strong> Search by artist or title. Tap ✕ to clear.</p>
+          <p style="margin:0 0 6px 0"><strong>Edit:</strong> Tap any entry to edit or delete. Drag to reorder (edit mode).</p>
+          <p style="margin:0 0 6px 0"><strong>Sections:</strong> Tap headers to collapse/expand. Use Expand All / Collapse All buttons.</p>
+          <p style="margin:0 0 6px 0"><strong>Export/Import:</strong> Backup your data anytime. Import from a previously exported file — all settings (categories, filters, top artists) are restored.</p>
+          <p style="margin:0"><strong>Tap any entry</strong> to open in Apple Music.</p>
+        </div>
+      </div>
     </div>
 
-    <!-- Footer: Action buttons (stays fixed at bottom, doesn't scroll) -->
+    <!-- Footer: Done button (stays fixed at bottom, doesn't scroll) -->
     <div style="flex-shrink:0;border-top:1px solid var(--border);padding-top:16px;display:flex;flex-direction:column;gap:10px">
-      <div style="display:flex;gap:10px">
-        <button class="modal-btn cancel" onclick="exportData(); return false;">📥 Export</button>
-        <button class="modal-btn cancel" onclick="document.getElementById('importFile').click(); return false;">📤 Import</button>
-      </div>
-      <button class="modal-btn cancel" onclick="toggleHelp(); return false;">❓ Help</button>
-      <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
-
-      <div id="helpContent" style="display:none;margin-top:12px;padding:12px;background:var(--card2);border-radius:12px;font-size:13px;line-height:1.6;color:var(--text)">
-        <h4 style="margin:0 0 10px 0;color:var(--accent)">Music Favorites Guide</h4>
-        <p style="margin:0 0 8px 0"><strong>Categories:</strong> Manage your categories in Settings. Each item must belong to a category (Sleep, Workout, Chill, Focus, etc.).</p>
-        <p style="margin:0 0 8px 0"><strong>Add Entry:</strong> Tap the + button to add items. Choose a category and rate items 1-5 stars.</p>
-        <p style="margin:0 0 8px 0"><strong>Organization:</strong> Items are grouped by category, then by star rating (5-Star, 4-Star, etc.).</p>
-        <p style="margin:0 0 8px 0"><strong>Search:</strong> Search by artist or title. Tap ✕ to clear.</p>
-        <p style="margin:0 0 8px 0"><strong>Edit:</strong> Tap any entry to edit or delete. Drag to reorder (edit mode).</p>
-        <p style="margin:0 0 8px 0"><strong>Sections:</strong> Tap headers to collapse/expand. Use Expand All / Collapse All buttons.</p>
-        <p style="margin:0 0 8px 0"><strong>Export/Import:</strong> Backup your data anytime. Import from a previously exported file.</p>
-        <p style="margin:0"><strong>Tap any entry</strong> to open in Apple Music.</p>
-      </div>
-
-      <div class="modal-actions" style="margin-top:12px">
+      <div class="modal-actions">
         <button class="modal-btn confirm" onclick="closeSettingsModal(); return false;">Done</button>
       </div>
     </div>
@@ -892,7 +890,6 @@ function saveTopArtists() {
 const FILTERS = {
   music: [
     { id:'all',            label:'All' },
-    { id:'new',            label:'New' },
     { id:'favorites',      label:'Favorites' },
     { id:'sleep-music',    label:'Sleep' },
     { id:'hypnosis',       label:'Hypnosis' },
@@ -960,9 +957,8 @@ function filterItems() {
     // Type/Rating filter
     switch (activeFilter) {
       case 'all':         return true;
-      case 'new':         return item.isNew && !item.toReview;
       case 'review':      return item.toReview;
-      case 'unrated':     return item.rating === 0 && !item.toReview && !item.isNew;
+      case 'unrated':     return item.rating === 0 && !item.toReview;
       case 'album':       return item.type === 'album';
       case 'playlist':    return item.type === 'playlist';
       case 'single':      return item.type === 'single';
@@ -984,7 +980,6 @@ function renderCard(item, idx) {
   const link  = musicLink(item);
 
   const badges = [];
-  if (item.isNew && !item.toReview) badges.push('<span class="badge badge-new">New</span>');
   if (item.toReview)                badges.push('<span class="badge badge-review">Review</span>');
   if (item.type !== 'album')        badges.push(`<span class="badge badge-${item.type}">${labelFor(item.type)}</span>`);
 
@@ -1285,7 +1280,7 @@ function populateCategoryDropdown() {
 }
 
 function openAddModal() {
-  modal = { isNew: true };
+  modal = { isCreating: true };
   document.getElementById('modalHeading').textContent = 'Add Entry';
   document.getElementById('modalTitle').value = '';
   document.getElementById('modalArtist').value = '';
@@ -1294,7 +1289,6 @@ function openAddModal() {
   document.getElementById('modalType').value = 'album';
   document.getElementById('modalYear').value = '';
   document.getElementById('modalRating').value = '4';
-  document.getElementById('modalNew').checked = true;
   document.getElementById('modalUrl').value = '';
   document.getElementById('deleteBtn').style.display = 'none';
   document.getElementById('modalOverlay').classList.add('show');
@@ -1303,7 +1297,7 @@ function openAddModal() {
 function openEditModal(idx) {
   const item = data[idx];
   if (!item) return;
-  modal = { isNew: false, idx };
+  modal = { isCreating: false, idx };
   document.getElementById('modalHeading').textContent = 'Edit Entry';
   document.getElementById('modalTitle').value = item.title;
   document.getElementById('modalArtist').value = item.artist;
@@ -1312,7 +1306,6 @@ function openEditModal(idx) {
   document.getElementById('modalType').value = item.type;
   document.getElementById('modalYear').value = item.year || '';
   document.getElementById('modalRating').value = item.rating || '0';
-  document.getElementById('modalNew').checked = item.isNew || false;
   document.getElementById('modalUrl').value = item.url || '';
   document.getElementById('deleteBtn').style.display = 'flex';
   document.getElementById('modalOverlay').classList.add('show');
@@ -1507,7 +1500,6 @@ function importArtistsList() {
       type: 'album',
       year: null,
       rating: 0,
-      isNew: true,
       toReview: false,
       url: null,
       isTopArtist: false,
@@ -1577,7 +1569,6 @@ function saveEntry() {
   const type = document.getElementById('modalType').value;
   const year = document.getElementById('modalYear').value ? parseInt(document.getElementById('modalYear').value) : null;
   const rating = parseInt(document.getElementById('modalRating').value) || 0;
-  const isNew = document.getElementById('modalNew').checked;
   const url = document.getElementById('modalUrl').value.trim() || null;
 
   if (!title || !artist || !category) {
@@ -1585,7 +1576,7 @@ function saveEntry() {
     return;
   }
 
-  if (modal.isNew) {
+  if (modal.isCreating) {
     const newItem = {
       category,
       type,
@@ -1593,7 +1584,6 @@ function saveEntry() {
       title,
       year,
       rating,
-      isNew,
       toReview: false
     };
     if (url) newItem.url = url;
@@ -1606,7 +1596,6 @@ function saveEntry() {
     item.type = type;
     item.year = year;
     item.rating = rating;
-    item.isNew = isNew;
     if (url) item.url = url;
     else delete item.url;
   }
