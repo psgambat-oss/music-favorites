@@ -461,8 +461,8 @@
       z-index: 200;
       display: none;
       align-items: flex-end;
-      padding: 8px;
-      padding-bottom: calc(8px + env(safe-area-inset-bottom));
+      padding: 0;
+      padding-bottom: env(safe-area-inset-bottom);
       pointer-events: auto;
     }
     .modal-overlay.show {
@@ -511,7 +511,7 @@
     .modal-actions {
       display: flex;
       gap: 10px;
-      margin-top: 20px;
+      margin-top: 0;
     }
     .modal-btn {
       flex: 1;
@@ -661,7 +661,7 @@
         <h4 style="margin:0 0 10px 0;font-size:13px;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:0.5px">Categories</h4>
         <div id="categoriesList" style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px"></div>
         <div style="display:flex;gap:8px">
-          <input type="text" id="newCategoryInput" placeholder="New category name" class="modal-input" style="flex:1;padding:10px;font-size:14px" autocomplete="off">
+          <input type="text" id="newCategoryInput" placeholder="New category name" class="modal-input" style="flex:1;padding:10px;font-size:14px;background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:6px" autocomplete="off">
           <button onclick="addCategory()" style="padding:10px 16px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-weight:600;cursor:pointer;flex-shrink:0">+</button>
         </div>
       </div>
@@ -724,7 +724,7 @@
     </div>
 
     <!-- Footer: Done button (stays fixed at bottom, doesn't scroll) -->
-    <div style="flex-shrink:0;border-top:1px solid var(--border);padding-top:16px;display:flex;flex-direction:column;gap:10px">
+    <div style="flex-shrink:0;border-top:none;padding-top:0;display:flex;flex-direction:column;gap:0">
       <div class="modal-actions">
         <button class="modal-btn confirm" onclick="closeSettingsModal(); return false;">Done</button>
       </div>
