@@ -60,11 +60,22 @@
     }
 
     .app-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
       font-size: 18px;
       font-weight: 800;
       letter-spacing: 1px;
       color: var(--accent);
       text-transform: uppercase;
+    }
+
+    .app-logo {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      object-fit: cover;
+      flex-shrink: 0;
     }
 
     .header-actions {
@@ -564,7 +575,10 @@
 
 <div class="app-header">
   <div class="app-header-top">
-    <div class="app-title">🎵 My Music Library</div>
+    <div class="app-title">
+      <img src="app-logo.jpeg" alt="Music Library" class="app-logo">
+      <span>My Music Library</span>
+    </div>
     <div class="header-actions">
       <button class="settings-btn" onclick="openSettingsModal()" title="Settings">⚙︎</button>
     </div>
