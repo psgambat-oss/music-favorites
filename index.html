@@ -1516,6 +1516,12 @@ function handleCSVImport(event) {
           row[header] = values[idx] || '';
         });
 
+        // Skip instruction rows (empty Artist or looks like instruction text)
+        if (!row.artist ||
+            row.artist.match(/^(Required|Optional|Type|Rating|Top Artist|Categories|How to Use|Instructions|\d+\.)/i)) {
+          continue; // Skip this row, don't validate or import
+        }
+
         const validation = validateCSVRow(row, i + 2); // +2 because of header and 1-indexing
         if (validation.errors.length > 0) {
           errors.push(...validation.errors);
