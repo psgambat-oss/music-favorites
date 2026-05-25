@@ -1,5 +1,20 @@
 # Music Favorites — Changelog
 
+## v2.0.2 — 2026-05-24
+- **Feature: Sort toggle integrated into All filter mode**
+  - Added "Rating • Artist" toggle below Expand/Collapse buttons
+  - Only visible when "All" filter is active
+  - Click to switch between rating-based and artist-based sorting
+  - Active sort mode displays in bright teal, inactive mode in gray
+  - New `renderSortToggle()` function manages toggle rendering
+  - New `setSortMode(mode)` function handles sort mode switching
+  - Maintains sort preference across page reloads
+- **UI cleanup: Removed star icons from rating sub-categories**
+  - Rating headers now show "Five (5)", "Four (4)", etc. instead of "⭐ Five (5)"
+  - Cleaner, more minimal appearance
+- **Updated app icon**
+  - New musical note icon with sound waves on teal gradient background
+
 ## v2.0.1 — 2026-05-24
 - **Bug fix: Settings modal buttons now clickable**
   - Added `pointer-events: auto` to `.modal-btn` CSS class

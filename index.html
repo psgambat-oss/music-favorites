@@ -287,6 +287,31 @@
       background: rgba(23, 162, 184, 0.2);
     }
 
+    .sort-toggle {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      padding: 4px 0;
+      margin-top: 6px;
+    }
+    .sort-toggle-item {
+      cursor: pointer;
+      transition: color 0.15s;
+      user-select: none;
+    }
+    .sort-toggle-item.active {
+      color: var(--accent);
+      font-weight: 600;
+    }
+    .sort-toggle-item.inactive {
+      color: var(--dim);
+    }
+    .sort-toggle-item.inactive:hover {
+      color: var(--accent-light);
+    }
+
     /* ── MUSIC CARD ── */
     .music-card {
       background: transparent;
@@ -550,10 +575,12 @@
     <span class="search-clear" id="searchClear" onclick="clearSearch()">✕</span>
   </div>
   <div class="filter-row" id="filterRow"></div>
-  <div class="collapse-controls" id="collapseControls" style="display:none; margin-top: 8px;">
-    <button onclick="expandAllSections()">Expand All</button>
-    <button onclick="collapseAllSections()">Collapse All</button>
-    <button id="sortBtn" onclick="toggleSort()" style="background: var(--card2); color: var(--dim); border: none; border-radius: 6px; padding: 3px 10px; font-size: 10px; cursor: pointer; font-family: inherit; font-weight: 600; letter-spacing: 0.3px; transition: all 0.15s;">Sort: Rating</button>
+  <div class="collapse-controls" id="collapseControls" style="display:none; margin-top: 8px; flex-direction: column; gap: 0;">
+    <div style="display: flex; gap: 6px;">
+      <button onclick="expandAllSections()">Expand All</button>
+      <button onclick="collapseAllSections()">Collapse All</button>
+    </div>
+    <div class="sort-toggle" id="sortToggle" style="display: none;"></div>
   </div>
 </div>
 
@@ -976,6 +1003,7 @@ function render() {
   const showGrouped = activeFilter === 'all' && !searchQuery && !isCategoryFilter;
   const hasGroupedSections = showGrouped;
   document.getElementById('collapseControls').style.display = hasGroupedSections ? 'flex' : 'none';
+  renderSortToggle();
   let html = `<div class="count-label">${items.length} item${items.length !== 1 ? 's' : ''}</div>`;
 
   if (showGrouped) {
@@ -996,12 +1024,12 @@ function render() {
     } else {
       // Group by user-created categories, then by rating within each category
       const ratingGroups = [
-        { label: '⭐ Five (5)', fn: i => i.rating === 5 },
-        { label: '⭐ Four (4)', fn: i => i.rating === 4 },
-        { label: '⭐ Three (3)', fn: i => i.rating === 3 },
-        { label: '⭐ Two (2)', fn: i => i.rating === 2 },
-        { label: '⭐ One (1)', fn: i => i.rating === 1 },
-        { label: '☁️ No Rating', fn: i => i.rating === 0 }
+        { label: 'Five (5)', fn: i => i.rating === 5 },
+        { label: 'Four (4)', fn: i => i.rating === 4 },
+        { label: 'Three (3)', fn: i => i.rating === 3 },
+        { label: 'Two (2)', fn: i => i.rating === 2 },
+        { label: 'One (1)', fn: i => i.rating === 1 },
+        { label: 'No Rating', fn: i => i.rating === 0 }
       ];
 
       // For each category, show items organized by rating
@@ -1028,12 +1056,12 @@ function render() {
   } else if (isCategoryFilter) {
     // Group by rating within the selected category
     const ratingGroups = [
-      { label: '⭐ Five (5)', fn: i => i.rating === 5 },
-      { label: '⭐ Four (4)', fn: i => i.rating === 4 },
-      { label: '⭐ Three (3)', fn: i => i.rating === 3 },
-      { label: '⭐ Two (2)', fn: i => i.rating === 2 },
-      { label: '⭐ One (1)', fn: i => i.rating === 1 },
-      { label: '☁️ No Rating', fn: i => i.rating === 0 }
+      { label: 'Five (5)', fn: i => i.rating === 5 },
+      { label: 'Four (4)', fn: i => i.rating === 4 },
+      { label: 'Three (3)', fn: i => i.rating === 3 },
+      { label: 'Two (2)', fn: i => i.rating === 2 },
+      { label: 'One (1)', fn: i => i.rating === 1 },
+      { label: 'No Rating', fn: i => i.rating === 0 }
     ];
 
     for (const rg of ratingGroups) {
@@ -1093,6 +1121,40 @@ function updateSortButton() {
   const btn = document.getElementById('sortBtn');
   if (btn) {
     btn.textContent = sortBy === 'artist' ? 'Sort: Artist' : 'Sort: Rating';
+  }
+}
+
+function renderSortToggle() {
+  const el = document.getElementById('sortToggle');
+  if (!el) return;
+
+  // Only show when "All" filter is active
+  if (activeFilter !== 'all') {
+    el.style.display = 'none';
+    return;
+  }
+
+  // Create the toggle HTML with active/inactive styles
+  const ratingClass = sortBy === 'rating' ? 'active' : 'inactive';
+  const artistClass = sortBy === 'artist' ? 'active' : 'inactive';
+
+  const ratingSpan = sortBy === 'rating'
+    ? `<span class="sort-toggle-item active">Rating</span>`
+    : `<span class="sort-toggle-item inactive" onclick="setSortMode('rating')">Rating</span>`;
+
+  const artistSpan = sortBy === 'artist'
+    ? `<span class="sort-toggle-item active">Artist</span>`
+    : `<span class="sort-toggle-item inactive" onclick="setSortMode('artist')">Artist</span>`;
+
+  el.innerHTML = `${ratingSpan} • ${artistSpan}`;
+  el.style.display = 'flex';
+}
+
+function setSortMode(mode) {
+  if (sortBy !== mode) {
+    sortBy = mode;
+    saveSortPreference();
+    render();
   }
 }
 
