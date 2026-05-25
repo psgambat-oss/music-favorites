@@ -984,7 +984,7 @@ function renderCard(item, idx) {
     <div class="card-icon">${icon}</div>
     <div class="card-body">
       <div class="card-title">${esc(item.special || '')}${esc(item.title)}${yearHtml}${ratingTitleHtml}</div>
-      <div class="card-artist">${esc(item.artist)}${topArtists.includes(item.artist) ? ' <span style="font-size:11px;color:var(--gold);margin-left:4px">⭐ TOP</span>' : ''}</div>
+      <div class="card-artist">${esc(item.artist)}${topArtists.includes(item.artist) ? ' <span style="font-size:12px;color:var(--accent);margin-left:4px;opacity:0.7">★</span>' : ''}</div>
       <div class="card-meta">${badges.join('')}</div>
     </div>
     <button class="card-edit-btn${editMode ? ' show' : ''}" onclick="event.preventDefault(); event.stopPropagation(); openEditModal(${idx})" title="Edit">✎</button>

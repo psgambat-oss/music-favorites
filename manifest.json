@@ -1,6 +1,6 @@
 {
   "name": "My Music Library",
-  "short_name": "My Music",
+  "short_name": "Music Library",
   "start_url": "/music-favorites/",
   "display": "standalone",
   "background_color": "#0f0f0f",
