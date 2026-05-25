@@ -1699,14 +1699,18 @@ function confirmDelete() {
 
 // ─── EXPORT / IMPORT ──────────────────────────────────────────────────────────
 async function exportData() {
+  // Ensure buttonConfigs is properly loaded from localStorage before export
+  // (in case it wasn't initialized properly in memory)
+  loadButtonConfig();
+
   // Export both data and settings
   const backup = {
     version: 2,
     items: data,
     categories: categories,
-    buttonConfigs: buttonConfigs,
+    buttonConfigs: buttonConfigs || [],  // Ensure it's always an array
     showAllButton: showAllButton,
-    topArtists: topArtists,
+    topArtists: topArtists || [],
     sortPreference: sortBy
   };
 
@@ -1754,7 +1758,14 @@ function importData(event) {
         // New format: includes items + all settings
         data = imported.items || [];
         categories = imported.categories || [];
-        buttonConfigs = imported.buttonConfigs || [];
+
+        // IMPORTANT: If imported backup doesn't have buttonConfigs, preserve current configuration
+        // This handles cases where an export didn't include buttonConfigs
+        if (imported.buttonConfigs !== undefined) {
+          buttonConfigs = imported.buttonConfigs;
+        }
+        // else: keep the current buttonConfigs (don't clear them)
+
         showAllButton = imported.showAllButton !== false;
         topArtists = imported.topArtists || [];
         sortBy = imported.sortPreference || 'rating';
