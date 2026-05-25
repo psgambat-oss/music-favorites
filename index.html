@@ -682,16 +682,21 @@
         <div id="topArtistsList" style="display:flex;flex-direction:column;gap:8px;max-height:200px;overflow-y:auto"></div>
       </div>
 
-      <!-- Import Artists -->
+      <!-- Import from CSV -->
       <div style="padding:12px;background:var(--card2);border-radius:10px">
-        <h4 style="margin:0 0 10px 0;font-size:13px;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:0.5px">Import Artists</h4>
-        <p style="font-size:12px;color:var(--dim);margin:0 0 10px 0">Paste artist names, one per line</p>
-        <textarea id="artistListInput" placeholder="Artist Name 1&#10;Artist Name 2&#10;Artist Name 3" style="width:100%;padding:10px;font-size:13px;background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:6px;font-family:monospace;min-height:80px;margin-bottom:10px;resize:none" autocomplete="off"></textarea>
-        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:400;text-transform:none;letter-spacing:0;margin-bottom:10px">
-          <span style="font-size:12px">Add to category:</span>
-          <select id="importCategorySelect" style="flex:1;padding:8px;background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:6px;font-size:12px"></select>
-        </label>
-        <button onclick="importArtistsList()" style="width:100%;padding:10px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-weight:600;cursor:pointer;font-size:13px">Import Artists</button>
+        <h4 style="margin:0 0 10px 0;font-size:13px;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:0.5px">Import from CSV</h4>
+        <p style="font-size:12px;color:var(--dim);margin:0 0 10px 0">Upload a CSV file with Artist, Title, Category, Type, Year, Rating, and URL columns.</p>
+
+        <div style="display:flex;gap:8px;margin-bottom:12px">
+          <button onclick="document.getElementById('csvImportFile').click()" style="flex:1;padding:10px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-weight:600;cursor:pointer;font-size:13px">📁 Choose CSV File</button>
+          <button onclick="downloadTemplate()" style="flex:1;padding:10px;background:var(--card);color:var(--accent);border:1px solid var(--accent);border-radius:8px;font-weight:600;cursor:pointer;font-size:13px">📥 Download Template</button>
+        </div>
+
+        <button onclick="copyTemplateLink()" style="width:100%;padding:10px;background:var(--card);color:var(--accent);border:1px solid var(--accent);border-radius:8px;font-weight:600;cursor:pointer;font-size:13px;margin-bottom:10px">📋 Copy Template Link</button>
+
+        <input type="file" id="csvImportFile" accept=".csv" style="display:none" onchange="handleCSVImport(event)">
+
+        <div id="csvPreview" style="display:none;font-size:12px;color:var(--dim);padding:10px;background:var(--bg);border-radius:6px;margin-top:10px"></div>
       </div>
 
       <!-- Export, Import, Help buttons (scrollable with content) -->
@@ -707,7 +712,7 @@
           <h4 style="margin:0 0 8px 0;color:var(--accent);font-size:12px">Music Library Guide</h4>
           <p style="margin:0 0 6px 0"><strong>Categories:</strong> Manage your categories in Settings. Each item must belong to a category (Sleep, Workout, Chill, Focus, etc.).</p>
           <p style="margin:0 0 6px 0"><strong>Add Entry:</strong> Tap the + button to add items. Choose a category and rate items 1-5 stars.</p>
-          <p style="margin:0 0 6px 0"><strong>Import Artists:</strong> In Settings, paste artist names (one per line) in the "Import Artists" section, select a category, and tap Import. Items are created as unrated entries — edit each one to add album title, year, and rating.</p>
+          <p style="margin:0 0 6px 0"><strong>Bulk Import:</strong> Create a CSV spreadsheet with columns: Artist, Title, Category, Type, Year, Rating, URL. Download the template from Settings → "Import from CSV" and fill it in. Upload the CSV to import all items at once with full data populated.</p>
           <p style="margin:0 0 6px 0"><strong>Organization:</strong> Items are grouped by category, then by star rating (5-Star, 4-Star, etc.).</p>
           <p style="margin:0 0 6px 0"><strong>Search:</strong> Search by artist or title. Tap ✕ to clear.</p>
           <p style="margin:0 0 6px 0"><strong>Edit:</strong> Tap any entry to edit or delete. Drag to reorder (edit mode).</p>
@@ -1457,55 +1462,135 @@ function populateImportCategoryDropdown() {
   select.innerHTML = html;
 }
 
-function parseArtistList(text) {
-  return text
-    .split('\n')
-    .map(line => line.trim())
-    .filter(line => line.length > 0);
+// ─── CSV IMPORT ───────────────────────────────────────────────────────────────
+const VALID_TYPES = ['album', 'playlist', 'single', 'holiday', 'hypnosis', 'sleep-music', 'affirmation'];
+
+function downloadTemplate() {
+  const link = document.createElement('a');
+  link.href = 'template.csv';
+  link.download = 'music-library-template.csv';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
 }
 
-function importArtistsList() {
-  const textarea = document.getElementById('artistListInput');
-  const categorySelect = document.getElementById('importCategorySelect');
+function copyTemplateLink() {
+  const templateUrl = 'https://psgambat-oss.github.io/music-favorites/template.csv';
+  navigator.clipboard.writeText(templateUrl).then(() => {
+    alert('Template link copied to clipboard!');
+  }).catch(() => {
+    alert('Could not copy link. You can access it at: ' + templateUrl);
+  });
+}
 
-  if (!textarea || !categorySelect) return;
+function handleCSVImport(event) {
+  const file = event.target.files[0];
+  if (!file) return;
 
-  const text = textarea.value.trim();
-  const selectedCategory = categorySelect.value;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const csv = e.target.result;
+      const rows = csv.split('\n').map(row => row.trim()).filter(row => row.length > 0);
 
-  if (!text) {
-    alert('Please enter at least one artist name');
-    return;
+      if (rows.length < 2) {
+        alert('CSV must have a header row and at least one data row');
+        return;
+      }
+
+      const headers = rows[0].split(',').map(h => h.trim().toLowerCase());
+      const requiredHeaders = ['artist', 'title', 'category'];
+      const hasRequiredHeaders = requiredHeaders.every(h => headers.includes(h));
+
+      if (!hasRequiredHeaders) {
+        alert(`CSV must have headers: ${requiredHeaders.join(', ')}`);
+        return;
+      }
+
+      const dataRows = rows.slice(1);
+      const errors = [];
+      const validItems = [];
+
+      for (let i = 0; i < dataRows.length; i++) {
+        const values = dataRows[i].split(',').map(v => v.trim());
+        const row = {};
+        headers.forEach((header, idx) => {
+          row[header] = values[idx] || '';
+        });
+
+        const validation = validateCSVRow(row, i + 2); // +2 because of header and 1-indexing
+        if (validation.errors.length > 0) {
+          errors.push(...validation.errors);
+        } else {
+          validItems.push(validation.item);
+        }
+      }
+
+      if (errors.length > 0) {
+        alert('CSV validation errors:\n\n' + errors.join('\n'));
+        return;
+      }
+
+      if (validItems.length === 0) {
+        alert('No valid items found in CSV');
+        return;
+      }
+
+      importCSVData(validItems);
+    } catch (error) {
+      alert('Error parsing CSV: ' + error.message);
+    }
+  };
+  reader.readAsText(file);
+}
+
+function validateCSVRow(row, lineNum) {
+  const errors = [];
+  const item = {
+    artist: row.artist || '',
+    title: row.title || '',
+    category: row.category || '',
+    type: row.type || 'album',
+    year: row.year ? parseInt(row.year) : null,
+    rating: row.rating ? parseInt(row.rating) : 0,
+    url: row.url || null,
+    toReview: false,
+    isTopArtist: false,
+    sleepRating: 0
+  };
+
+  // Validate required fields
+  if (!item.artist) errors.push(`Line ${lineNum}: Artist is required`);
+  if (!item.title) errors.push(`Line ${lineNum}: Title is required`);
+  if (!item.category) errors.push(`Line ${lineNum}: Category is required`);
+
+  // Validate category exists
+  if (item.category && !categories.includes(item.category)) {
+    errors.push(`Line ${lineNum}: Category "${item.category}" does not exist`);
   }
 
-  if (!selectedCategory) {
-    alert('Please select a category');
-    return;
+  // Validate type
+  if (!VALID_TYPES.includes(item.type)) {
+    errors.push(`Line ${lineNum}: Type "${item.type}" is invalid. Must be one of: ${VALID_TYPES.join(', ')}`);
   }
 
-  const artistNames = parseArtistList(text);
-
-  if (artistNames.length === 0) {
-    alert('No valid artist names found');
-    return;
+  // Validate rating
+  if (row.rating && (item.rating < 1 || item.rating > 5 || !Number.isInteger(item.rating))) {
+    errors.push(`Line ${lineNum}: Rating must be 1-5, got "${row.rating}"`);
   }
 
-  // Create items for each artist
+  // Validate year
+  if (row.year && (isNaN(item.year) || item.year < 1900 || item.year > 2999)) {
+    errors.push(`Line ${lineNum}: Year must be numeric between 1900 and 2999, got "${row.year}"`);
+  }
+
+  return { item, errors };
+}
+
+function importCSVData(items) {
   let importedCount = 0;
-  for (const artistName of artistNames) {
-    const newItem = {
-      artist: artistName,
-      title: '',
-      category: selectedCategory,
-      type: 'album',
-      year: null,
-      rating: 0,
-      toReview: false,
-      url: null,
-      isTopArtist: false,
-      sleepRating: 0
-    };
-    data.push(newItem);
+  for (const item of items) {
+    data.push(item);
     importedCount++;
   }
 
@@ -1513,10 +1598,10 @@ function importArtistsList() {
   saveData();
   closeSettingsModal();
   render();
-  alert(`Imported ${importedCount} artist${importedCount !== 1 ? 's' : ''} to "${selectedCategory}". Edit each to add album details.`);
+  alert(`Imported ${importedCount} album${importedCount !== 1 ? 's' : ''}!\n\nAll data is populated. Edit as needed to make changes.`);
 
-  // Clear textarea for next import
-  textarea.value = '';
+  // Reset file input
+  document.getElementById('csvImportFile').value = '';
 }
 
 // ─── DRAG & DROP ──────────────────────────────────────────────────────────────
