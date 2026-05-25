@@ -667,6 +667,12 @@
         </label>
         <div id="buttonConfigList" style="display:flex;flex-direction:column;gap:12px"></div>
       </div>
+
+      <!-- Top Artists Management -->
+      <div style="padding:12px;background:var(--card2);border-radius:10px">
+        <h4 style="margin:0 0 10px 0;font-size:13px;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:0.5px">Top Artists</h4>
+        <div id="topArtistsList" style="display:flex;flex-direction:column;gap:8px;max-height:200px;overflow-y:auto"></div>
+      </div>
     </div>
 
     <!-- Footer: Action buttons (stays fixed at bottom, doesn't scroll) -->
@@ -966,7 +972,7 @@ function renderCard(item, idx) {
     <div class="card-icon">${icon}</div>
     <div class="card-body">
       <div class="card-title">${esc(item.special || '')}${esc(item.title)}${yearHtml}${ratingTitleHtml}</div>
-      <div class="card-artist">${esc(item.artist)}</div>
+      <div class="card-artist">${esc(item.artist)}${topArtists.includes(item.artist) ? ' <span style="font-size:11px;color:var(--gold);margin-left:4px">⭐ TOP</span>' : ''}</div>
       <div class="card-meta">${badges.join('')}</div>
     </div>
     <button class="card-edit-btn${editMode ? ' show' : ''}" onclick="event.preventDefault(); event.stopPropagation(); openEditModal(${idx})" title="Edit">✎</button>
@@ -1028,15 +1034,19 @@ function render() {
 
   if (showGrouped) {
     if (sortBy === 'artist') {
-      // Group by artist name
-      const uniqueArtists = [...new Set(items.map(i => i.artist || 'Unknown'))].sort();
+      // Group by artist name - top artists first, then alphabetical
+      const uniqueArtists = [...new Set(items.map(i => i.artist || 'Unknown'))];
+      const topArtistsArray = uniqueArtists.filter(a => topArtists.includes(a)).sort();
+      const otherArtistsArray = uniqueArtists.filter(a => !topArtists.includes(a)).sort();
+      const sortedArtists = [...topArtistsArray, ...otherArtistsArray];
 
-      for (const artist of uniqueArtists) {
+      for (const artist of sortedArtists) {
         const artistItems = items.filter(i => (i.artist || 'Unknown') === artist);
         if (!artistItems.length) continue;
 
         const artistId = 'artist-' + artist.replace(/\W/g, '');
-        html += `<div class="section-label section-main" onclick="toggleSection('${artistId}')">${esc(artist)}<span class="chevron">›</span></div>`;
+        const topBadge = topArtists.includes(artist) ? ' <span style="font-size:11px;color:var(--gold)">⭐ TOP</span>' : '';
+        html += `<div class="section-label section-main" onclick="toggleSection('${artistId}')">${esc(artist)}${topBadge}<span class="chevron">›</span></div>`;
 
         const cards = sortItems(artistItems).map((item) => renderCard(item, data.indexOf(item))).join('');
         html += `<div class="section-body collapsed" id="${artistId}">${cards}</div>`;
@@ -1290,6 +1300,7 @@ function closeModal() {
 function openSettingsModal() {
   renderCategoriesList();
   renderButtonConfig();
+  renderTopArtistsList();
   document.getElementById('settingsOverlay').classList.add('show');
 }
 
@@ -1372,6 +1383,46 @@ function renderButtonConfig() {
   container.innerHTML = html;
 }
 
+function renderTopArtistsList() {
+  const container = document.getElementById('topArtistsList');
+
+  // Get unique artists from data
+  const uniqueArtists = [...new Set(data.map(item => item.artist || 'Unknown'))].sort();
+
+  if (uniqueArtists.length === 0) {
+    container.innerHTML = '<p style="font-size:12px;color:var(--dim);text-align:center;padding:10px">No artists yet. Add items to get started.</p>';
+    return;
+  }
+
+  let html = '';
+  for (const artist of uniqueArtists) {
+    const isTop = topArtists.includes(artist);
+    html += `
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:400;text-transform:none;letter-spacing:0;padding:6px;border-radius:6px;background:var(--bg)">
+        <input type="checkbox" ${isTop ? 'checked' : ''} onchange="toggleTopArtist('${esc(artist)}', this.checked)" style="width:18px;height:18px;cursor:pointer">
+        <span>${esc(artist)}</span>
+      </label>
+    `;
+  }
+
+  container.innerHTML = html;
+}
+
+function toggleTopArtist(artistName, isChecked) {
+  if (isChecked) {
+    if (!topArtists.includes(artistName)) {
+      topArtists.push(artistName);
+      saveTopArtists();
+    }
+  } else {
+    const idx = topArtists.indexOf(artistName);
+    if (idx !== -1) {
+      topArtists.splice(idx, 1);
+      saveTopArtists();
+    }
+  }
+  render(); // Re-render to show badge updates
+}
 
 // ─── DRAG & DROP ──────────────────────────────────────────────────────────────
 let draggedIdx = null;
