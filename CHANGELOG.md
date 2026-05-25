@@ -3,6 +3,7 @@
 ## v2.1 — 2026-05-25
 - **Renamed app: "Sound Vault" → "My Music Library"**
   - Updated app title, meta tags, and manifest
+  - Home screen display: "Music Library" (short_name for better mobile fit)
   - More personalized and descriptive app name
 - **Export improvements: Native file sharing**
   - iOS/Android: Share sheet (AirDrop, Mail, Messages, etc.)
@@ -12,9 +13,9 @@
 - **Top Artists feature**
   - New `isTopArtist` flag on items
   - Settings → "Top Artists Management" section with checkboxes
-  - "⭐ TOP" badge displays next to artist name on cards
+  - Subtle ★ badge (teal, 70% opacity) displays next to artist name
   - In Artist view: top artists bubble to top of list
-  - Edit modal checkbox to mark/unmark artists as top
+  - Badge also appears on artist section headers
   - New localStorage key: `music_favorites_top_artists_v1`
 - **Rating vs Artist toggle relocation**
   - Moved from below Expand/Collapse to same line (left side)
