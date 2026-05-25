@@ -1125,11 +1125,11 @@ function render() {
   } else if (isCategoryFilter) {
     // Group by rating within the selected category
     const ratingGroups = [
-      { label: 'Five (5)', fn: i => i.rating === 5 },
-      { label: 'Four (4)', fn: i => i.rating === 4 },
-      { label: 'Three (3)', fn: i => i.rating === 3 },
-      { label: 'Two (2)', fn: i => i.rating === 2 },
-      { label: 'One (1)', fn: i => i.rating === 1 },
+      { label: 'Five (5) <span style="color:var(--dim)">★</span>', fn: i => i.rating === 5 },
+      { label: 'Four (4) <span style="color:var(--dim)">★</span>', fn: i => i.rating === 4 },
+      { label: 'Three (3) <span style="color:var(--dim)">★</span>', fn: i => i.rating === 3 },
+      { label: 'Two (2) <span style="color:var(--dim)">★</span>', fn: i => i.rating === 2 },
+      { label: 'One (1) <span style="color:var(--dim)">★</span>', fn: i => i.rating === 1 },
       { label: 'No Rating', fn: i => i.rating === 0 }
     ];
 
