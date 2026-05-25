@@ -553,6 +553,7 @@
   <div class="collapse-controls" id="collapseControls" style="display:none; margin-top: 8px;">
     <button onclick="expandAllSections()">Expand All</button>
     <button onclick="collapseAllSections()">Collapse All</button>
+    <button id="sortBtn" onclick="toggleSort()" style="background: var(--card2); color: var(--dim); border: none; border-radius: 6px; padding: 3px 10px; font-size: 10px; cursor: pointer; font-family: inherit; font-weight: 600; letter-spacing: 0.3px; transition: all 0.15s;">Sort: Rating</button>
   </div>
 </div>
 
@@ -701,9 +702,11 @@ let data              = [];
 let categories        = [];
 let showAllButton      = true;
 let buttonConfigs      = []; // Array of {category, name} objects for filter buttons
+let sortBy            = 'rating'; // 'rating' or 'artist'
 const STORAGE_KEY = 'music_favorites_v1';
 const CATEGORIES_KEY = 'music_favorites_categories_v1';
 const BUTTON_CONFIG_KEY = 'music_favorites_button_config_v1';
+const SORT_PREFERENCE_KEY = 'music_favorites_sort_v1';
 const DEFAULT_CATEGORIES = ['Sleep', 'Workout', 'Chill', 'Focus'];
 
 // ─── STORAGE ──────────────────────────────────────────────────────────────────
@@ -721,6 +724,7 @@ function loadData() {
   }
   loadCategories();
   loadButtonConfig();
+  loadSortPreference();
 }
 
 function saveData() {
@@ -787,6 +791,24 @@ function saveButtonConfig() {
   }));
 
   renderFilters();
+}
+
+function loadSortPreference() {
+  try {
+    const stored = localStorage.getItem(SORT_PREFERENCE_KEY);
+    if (stored) {
+      sortBy = stored === 'artist' ? 'artist' : 'rating';
+    } else {
+      sortBy = 'rating';
+    }
+  } catch(e) {
+    sortBy = 'rating';
+  }
+}
+
+function saveSortPreference() {
+  localStorage.setItem(SORT_PREFERENCE_KEY, sortBy);
+  render();
 }
 
 // ─── FILTERS ─────────────────────────────────────────────────────────────────
@@ -914,14 +936,24 @@ function labelFor(type) {
 // ─── SORT ────────────────────────────────────────────────────────────────────
 function sortItems(items) {
   return items.slice().sort((a, b) => {
-    if (b.rating !== a.rating) return b.rating - a.rating;
-    if ((b.sleepRating || 0) !== (a.sleepRating || 0)) return (b.sleepRating || 0) - (a.sleepRating || 0);
-    return (b.year || 0) - (a.year || 0);
+    if (sortBy === 'artist') {
+      // Sort by artist name alphabetically, then by rating
+      const artistA = (a.artist || '').toLowerCase();
+      const artistB = (b.artist || '').toLowerCase();
+      if (artistA !== artistB) return artistA.localeCompare(artistB);
+      return b.rating - a.rating;
+    } else {
+      // Sort by rating (default)
+      if (b.rating !== a.rating) return b.rating - a.rating;
+      if ((b.sleepRating || 0) !== (a.sleepRating || 0)) return (b.sleepRating || 0) - (a.sleepRating || 0);
+      return (b.year || 0) - (a.year || 0);
+    }
   });
 }
 
 // ─── RENDER ──────────────────────────────────────────────────────────────────
 function render() {
+  updateSortButton();
   const items = filterItems();
   const el = document.getElementById('content');
 
@@ -1024,6 +1056,19 @@ function collapseAllSections() {
     label.classList.add('collapsed');
     label.classList.remove('open');
   });
+}
+
+function toggleSort() {
+  sortBy = sortBy === 'rating' ? 'artist' : 'rating';
+  saveSortPreference();
+  updateSortButton();
+}
+
+function updateSortButton() {
+  const btn = document.getElementById('sortBtn');
+  if (btn) {
+    btn.textContent = sortBy === 'artist' ? 'Sort: Artist' : 'Sort: Rating';
+  }
 }
 
 // ─── FILTERS BAR ─────────────────────────────────────────────────────────────
