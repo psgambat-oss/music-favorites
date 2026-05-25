@@ -1257,19 +1257,18 @@ function renderButtonConfig() {
   const MAX_SLOTS = 5;
   const buttonArray = Array.isArray(buttonConfigs) ? buttonConfigs : [];
 
-  // Get assigned categories (simple string array now)
-  const assignedCategories = buttonArray.filter(c => c);
-
   let html = '';
   for (let i = 0; i < MAX_SLOTS; i++) {
     const selectedCat = buttonArray[i] || '';
 
-    // Build dropdown options: show all categories except those assigned to other slots
+    // Build dropdown options: show all categories
     const dropdownOptions = ['<option value="">-- Select category --</option>'];
-    for (const cat of categories) {
-      const isAssigned = assignedCategories.includes(cat) && cat !== selectedCat;
-      if (!isAssigned) {
-        dropdownOptions.push(`<option value="${esc(cat)}" ${selectedCat === cat ? 'selected' : ''}>${esc(cat)}</option>`);
+
+    // Add all categories
+    if (Array.isArray(categories)) {
+      for (const cat of categories) {
+        const isSelected = selectedCat === cat ? 'selected' : '';
+        dropdownOptions.push(`<option value="${esc(cat)}" ${isSelected}>${esc(cat)}</option>`);
       }
     }
 
