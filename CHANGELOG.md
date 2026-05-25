@@ -1,5 +1,11 @@
 # Music Favorites — Changelog
 
+## v2.0.1 — 2026-05-24
+- **Bug fix: Settings modal buttons now clickable**
+  - Added `pointer-events: auto` to `.modal-btn` CSS class
+  - Export, Import, and Help buttons in Settings now respond to clicks
+  - Cleaned up redundant inline pointer-events styles
+
 ## v2.0 — 2026-05-24
 - **Complete rebuild: User-created categories instead of hardcoded sections**
   - Removed hardcoded song data (app starts empty)
