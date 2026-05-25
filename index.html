@@ -886,8 +886,8 @@ function renderCard(item, idx) {
   const cardContent = `
     <div class="card-icon">${icon}</div>
     <div class="card-body">
-      <div class="card-title">${esc(item.special || '')}${esc(item.title)}</div>
-      <div class="card-artist">${esc(item.artist)}${yearHtml}</div>
+      <div class="card-title">${esc(item.special || '')}${esc(item.title)}${yearHtml}</div>
+      <div class="card-artist">${esc(item.artist)}</div>
       <div class="card-meta">${badges.join('')}</div>
     </div>
     <button class="card-edit-btn${editMode ? ' show' : ''}" onclick="event.preventDefault(); event.stopPropagation(); openEditModal(${idx})" title="Edit">✎</button>
