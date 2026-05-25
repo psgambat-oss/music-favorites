@@ -1,3 +1,10 @@
+# CSV Import Format Guide
+# Required columns: Artist, Title, Category
+# Optional columns: Year, Type, Rating, Top Artist, URL
+# Type options: album, playlist, single, audio, other
+# Rating: 1-5 (leave blank for unrated)
+# Top Artist: enter "Yes" to mark as favorite, leave blank to skip
+# Category must already exist in your app (add categories in Settings first)
 Artist,Title,Year,Category,Type,Rating,Top Artist,URL
 Weyes Blood,Titanic Rising,2019,Sleep,album,5,Yes,https://music.apple.com/us/album/titanic-rising/1467954259
 Bon Iver,i i,2019,Sleep,album,4,,https://music.apple.com/us/album/i-i/1457971826
