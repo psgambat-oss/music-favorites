@@ -1496,8 +1496,12 @@ function handleCSVImport(event) {
         return;
       }
 
-      const headers = rows[0].split(',').map(h => h.trim().toLowerCase());
+      const allHeaders = rows[0].split(',').map(h => h.trim().toLowerCase());
+      const expectedHeaders = ['artist', 'title', 'year', 'category', 'type', 'rating', 'top artist', 'url'];
       const requiredHeaders = ['artist', 'title', 'category'];
+
+      // Only use the first 8 headers (ignore any instruction columns)
+      const headers = allHeaders.slice(0, 8);
       const hasRequiredHeaders = requiredHeaders.every(h => headers.includes(h));
 
       if (!hasRequiredHeaders) {
@@ -1512,6 +1516,7 @@ function handleCSVImport(event) {
       for (let i = 0; i < dataRows.length; i++) {
         const values = dataRows[i].split(',').map(v => v.trim());
         const row = {};
+        // Only read the first 8 columns (ignore instruction columns beyond that)
         headers.forEach((header, idx) => {
           row[header] = values[idx] || '';
         });
