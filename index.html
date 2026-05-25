@@ -1773,7 +1773,11 @@ function importData(event) {
         // Save all settings to localStorage
         saveData();
         saveCategories();
-        saveButtonConfig();
+        // Save buttonConfigs directly (don't use saveButtonConfig which reads from DOM)
+        localStorage.setItem(BUTTON_CONFIG_KEY, JSON.stringify({
+          showAllButton,
+          buttonConfigs
+        }));
         saveTopArtists();
         saveSortPreference();
       } else {
