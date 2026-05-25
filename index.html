@@ -894,6 +894,13 @@ function filterItems() {
   });
 }
 
+// ─── RENDER HELPERS ──────────────────────────────────────────────────────────
+function getRatingLabel(rating) {
+  if (!rating) return '';
+  const labels = ['', 'ONE (1)', 'TWO (2)', 'THREE (3)', 'FOUR (4)', 'FIVE (5)'];
+  return labels[rating] || '';
+}
+
 // ─── RENDER CARD ──────────────────────────────────────────────────────────────
 function renderCard(item, idx) {
   const icon  = item.icon || TYPE_ICON[item.type] || '🎵';
@@ -907,11 +914,13 @@ function renderCard(item, idx) {
   const ratingHtml = `<span class="rating">${renderStars(item.rating)}</span>`;
 
   const yearHtml = item.year ? `<span class="card-year">• ${item.year}</span>` : '';
+  const ratingLabel = getRatingLabel(item.rating);
+  const ratingTitleHtml = ratingLabel ? `<span class="card-year">• ${ratingLabel}</span>` : '';
 
   const cardContent = `
     <div class="card-icon">${icon}</div>
     <div class="card-body">
-      <div class="card-title">${esc(item.special || '')}${esc(item.title)}${yearHtml}</div>
+      <div class="card-title">${esc(item.special || '')}${esc(item.title)}${yearHtml}${ratingTitleHtml}</div>
       <div class="card-artist">${esc(item.artist)}</div>
       <div class="card-meta">${badges.join('')}</div>
     </div>
@@ -970,35 +979,51 @@ function render() {
   let html = `<div class="count-label">${items.length} item${items.length !== 1 ? 's' : ''}</div>`;
 
   if (showGrouped) {
-    // Group by user-created categories, then by rating within each category
-    const ratingGroups = [
-      { label: '⭐ Five (5)', fn: i => i.rating === 5 },
-      { label: '⭐ Four (4)', fn: i => i.rating === 4 },
-      { label: '⭐ Three (3)', fn: i => i.rating === 3 },
-      { label: '⭐ Two (2)', fn: i => i.rating === 2 },
-      { label: '⭐ One (1)', fn: i => i.rating === 1 },
-      { label: '☁️ No Rating', fn: i => i.rating === 0 }
-    ];
+    if (sortBy === 'artist') {
+      // Group by artist name
+      const uniqueArtists = [...new Set(items.map(i => i.artist || 'Unknown'))].sort();
 
-    // For each category, show items organized by rating
-    for (const cat of categories) {
-      const catItems = items.filter(i => i.category === cat);
-      if (!catItems.length) continue;
+      for (const artist of uniqueArtists) {
+        const artistItems = items.filter(i => (i.artist || 'Unknown') === artist);
+        if (!artistItems.length) continue;
 
-      const catId = 'cat-' + cat.replace(/\W/g, '');
-      html += `<div class="section-label section-main" onclick="toggleSection('${catId}')">${esc(cat)}<span class="chevron">›</span></div>`;
+        const artistId = 'artist-' + artist.replace(/\W/g, '');
+        html += `<div class="section-label section-main" onclick="toggleSection('${artistId}')">${esc(artist)}<span class="chevron">›</span></div>`;
 
-      let catContent = '';
-      for (const rg of ratingGroups) {
-        const sub = sortItems(catItems.filter(rg.fn));
-        if (!sub.length) continue;
-        const subId = catId + '-' + rg.label.replace(/\W/g, '');
-        const cards = sub.map((item) => renderCard(item, data.indexOf(item))).join('');
-        catContent += `<div class="sub-section-label" onclick="toggleSection('${subId}')">${rg.label}</div>`;
-        catContent += `<div class="section-body" id="${subId}">${cards}</div>`;
+        const cards = sortItems(artistItems).map((item) => renderCard(item, data.indexOf(item))).join('');
+        html += `<div class="section-body collapsed" id="${artistId}">${cards}</div>`;
       }
+    } else {
+      // Group by user-created categories, then by rating within each category
+      const ratingGroups = [
+        { label: '⭐ Five (5)', fn: i => i.rating === 5 },
+        { label: '⭐ Four (4)', fn: i => i.rating === 4 },
+        { label: '⭐ Three (3)', fn: i => i.rating === 3 },
+        { label: '⭐ Two (2)', fn: i => i.rating === 2 },
+        { label: '⭐ One (1)', fn: i => i.rating === 1 },
+        { label: '☁️ No Rating', fn: i => i.rating === 0 }
+      ];
 
-      html += `<div class="section-body collapsed" id="${catId}">${catContent}</div>`;
+      // For each category, show items organized by rating
+      for (const cat of categories) {
+        const catItems = items.filter(i => i.category === cat);
+        if (!catItems.length) continue;
+
+        const catId = 'cat-' + cat.replace(/\W/g, '');
+        html += `<div class="section-label section-main" onclick="toggleSection('${catId}')">${esc(cat)}<span class="chevron">›</span></div>`;
+
+        let catContent = '';
+        for (const rg of ratingGroups) {
+          const sub = sortItems(catItems.filter(rg.fn));
+          if (!sub.length) continue;
+          const subId = catId + '-' + rg.label.replace(/\W/g, '');
+          const cards = sub.map((item) => renderCard(item, data.indexOf(item))).join('');
+          catContent += `<div class="sub-section-label" onclick="toggleSection('${subId}')">${rg.label}</div>`;
+          catContent += `<div class="section-body" id="${subId}">${cards}</div>`;
+        }
+
+        html += `<div class="section-body collapsed" id="${catId}">${catContent}</div>`;
+      }
     }
   } else if (isCategoryFilter) {
     // Group by rating within the selected category
