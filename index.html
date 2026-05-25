@@ -10,8 +10,8 @@
   <link rel="apple-touch-icon" href="icon.png">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Sound Vault">
-  <title>Sound Vault</title>
+  <meta name="apple-mobile-web-app-title" content="My Music Library">
+  <title>My Music Library</title>
   <style>
     :root {
       --bg:      #0a0a0a;
@@ -564,7 +564,7 @@
 
 <div class="app-header">
   <div class="app-header-top">
-    <div class="app-title">🎵 Sound Vault</div>
+    <div class="app-title">🎵 My Music Library</div>
     <div class="header-actions">
       <button class="settings-btn" onclick="openSettingsModal()" title="Settings">⚙︎</button>
     </div>
@@ -575,12 +575,10 @@
     <span class="search-clear" id="searchClear" onclick="clearSearch()">✕</span>
   </div>
   <div class="filter-row" id="filterRow"></div>
-  <div class="collapse-controls" id="collapseControls" style="display:none; margin-top: 8px; flex-direction: column; gap: 0;">
-    <div style="display: flex; gap: 6px;">
-      <button onclick="expandAllSections()">Expand All</button>
-      <button onclick="collapseAllSections()">Collapse All</button>
-    </div>
+  <div class="collapse-controls" id="collapseControls" style="display:none; margin-top: 8px; align-items: center; gap: 12px;">
     <div class="sort-toggle" id="sortToggle" style="display: none;"></div>
+    <button onclick="expandAllSections()">Expand All</button>
+    <button onclick="collapseAllSections()">Collapse All</button>
   </div>
 </div>
 
@@ -730,10 +728,12 @@ let categories        = [];
 let showAllButton      = true;
 let buttonConfigs      = []; // Array of {category, name} objects for filter buttons
 let sortBy            = 'rating'; // 'rating' or 'artist'
+let topArtists        = []; // Array of artist names marked as top
 const STORAGE_KEY = 'music_favorites_v1';
 const CATEGORIES_KEY = 'music_favorites_categories_v1';
 const BUTTON_CONFIG_KEY = 'music_favorites_button_config_v1';
 const SORT_PREFERENCE_KEY = 'music_favorites_sort_v1';
+const TOP_ARTISTS_KEY = 'music_favorites_top_artists_v1';
 const DEFAULT_CATEGORIES = ['Sleep', 'Workout', 'Chill', 'Focus'];
 
 // ─── STORAGE ──────────────────────────────────────────────────────────────────
@@ -752,6 +752,7 @@ function loadData() {
   loadCategories();
   loadButtonConfig();
   loadSortPreference();
+  loadTopArtists();
 }
 
 function saveData() {
@@ -836,6 +837,23 @@ function loadSortPreference() {
 function saveSortPreference() {
   localStorage.setItem(SORT_PREFERENCE_KEY, sortBy);
   render();
+}
+
+function loadTopArtists() {
+  try {
+    const stored = localStorage.getItem(TOP_ARTISTS_KEY);
+    if (stored) {
+      topArtists = JSON.parse(stored);
+    } else {
+      topArtists = [];
+    }
+  } catch(e) {
+    topArtists = [];
+  }
+}
+
+function saveTopArtists() {
+  localStorage.setItem(TOP_ARTISTS_KEY, JSON.stringify(topArtists));
 }
 
 // ─── FILTERS ─────────────────────────────────────────────────────────────────
@@ -1001,8 +1019,10 @@ function render() {
   // Show grouped view when: "All" filter is active AND no search AND not a category filter
   const isCategoryFilter = activeFilter.startsWith('cat:');
   const showGrouped = activeFilter === 'all' && !searchQuery && !isCategoryFilter;
-  const hasGroupedSections = showGrouped;
-  document.getElementById('collapseControls').style.display = hasGroupedSections ? 'flex' : 'none';
+
+  // Show collapse controls when: grouped view OR category filter view (both show grouped by rating)
+  const showCollapseControls = showGrouped || isCategoryFilter;
+  document.getElementById('collapseControls').style.display = showCollapseControls ? 'flex' : 'none';
   renderSortToggle();
   let html = `<div class="count-label">${items.length} item${items.length !== 1 ? 's' : ''}</div>`;
 
@@ -1128,8 +1148,12 @@ function renderSortToggle() {
   const el = document.getElementById('sortToggle');
   if (!el) return;
 
-  // Only show when "All" filter is active
-  if (activeFilter !== 'all') {
+  // Show when viewing "All" or a category filter (grouped by rating/artist)
+  // Hide when searching or filtering by type
+  const isCategoryFilter = activeFilter.startsWith('cat:');
+  const shouldShow = (activeFilter === 'all' || isCategoryFilter) && !searchQuery;
+
+  if (!shouldShow) {
     el.style.display = 'none';
     return;
   }
@@ -1448,17 +1472,31 @@ function confirmDelete() {
 }
 
 // ─── EXPORT / IMPORT ──────────────────────────────────────────────────────────
-function exportData() {
+async function exportData() {
   const dataStr = JSON.stringify(data, null, 2);
+  const filename = `my-music-library-${new Date().toISOString().slice(0,10)}.json`;
   const blob = new Blob([dataStr], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `music-favorites-${new Date().toISOString().split('T')[0]}.json`;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
+  const file = new File([blob], filename, { type: 'application/json' });
+
+  // iOS/Android: Use native share sheet if available
+  if (navigator.canShare && navigator.canShare({ files: [file] }) && !window.showDirectoryPicker) {
+    try {
+      await navigator.share({ files: [file], title: 'My Music Library Backup' });
+    } catch (err) {
+      // User cancelled share or error occurred
+      console.log('Share cancelled', err);
+    }
+  } else {
+    // Fallback for desktop browsers: download file
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
 }
 
 function importData(event) {

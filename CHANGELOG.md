@@ -1,4 +1,33 @@
-# Music Favorites — Changelog
+# My Music Library — Changelog
+
+## v2.1 — 2026-05-25
+- **Renamed app: "Sound Vault" → "My Music Library"**
+  - Updated app title, meta tags, and manifest
+  - More personalized and descriptive app name
+- **Export improvements: Native file sharing**
+  - iOS/Android: Share sheet (AirDrop, Mail, Messages, etc.)
+  - Desktop: Download to Downloads folder
+  - Uses `navigator.canShare()` API with fallback to `URL.createObjectURL()`
+  - Filename updated to `my-music-library-YYYY-MM-DD.json`
+- **Top Artists feature**
+  - New `isTopArtist` flag on items
+  - Settings → "Top Artists Management" section with checkboxes
+  - "⭐ TOP" badge displays next to artist name on cards
+  - In Artist view: top artists bubble to top of list
+  - Edit modal checkbox to mark/unmark artists as top
+  - New localStorage key: `music_favorites_top_artists_v1`
+- **Rating vs Artist toggle relocation**
+  - Moved from below Expand/Collapse to same line (left side)
+  - Now visible in ALL category filter views, not just "All"
+  - Hidden when searching or filtering by type
+  - Maintains all previous functionality
+- **List import feature: Import artists**
+  - New Settings section: "Import Artists"
+  - Paste artist names (one per line) into textarea
+  - Select target category
+  - Creates items with auto-populated fields (artist, category, type, rating=0)
+  - Items marked as "New" for easy identification
+  - New functions: `parseArtistList()`, `importArtistsList()`
 
 ## v2.0.2 — 2026-05-24
 - **Feature: Sort toggle integrated into All filter mode**

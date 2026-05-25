@@ -1,6 +1,6 @@
 {
-  "name": "Music Favorites 2025",
-  "short_name": "Music",
+  "name": "My Music Library",
+  "short_name": "My Music",
   "start_url": "/music-favorites/",
   "display": "standalone",
   "background_color": "#0f0f0f",
