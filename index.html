@@ -1084,8 +1084,8 @@ function render() {
         if (!artistItems.length) continue;
 
         const artistId = 'artist-' + artist.replace(/\W/g, '');
-        const topBadge = topArtists.includes(artist) ? ' <span style="font-size:11px;color:var(--gold)">⭐ TOP</span>' : '';
-        html += `<div class="section-label section-main" onclick="toggleSection('${artistId}')">${esc(artist)}${topBadge}<span class="chevron">›</span></div>`;
+        const topBadge = topArtists.includes(artist) ? '<span style="font-size:12px;color:var(--dim)">★ TOP ARTIST</span>' : '';
+        html += `<div class="section-label section-main" style="display:flex;justify-content:space-between;align-items:center" onclick="toggleSection('${artistId}')">${esc(artist)}<div style="display:flex;align-items:center;gap:8px">${topBadge}<span class="chevron">›</span></div></div>`;
 
         const cards = sortItems(artistItems).map((item) => renderCard(item, data.indexOf(item))).join('');
         html += `<div class="section-body collapsed" id="${artistId}">${cards}</div>`;
