@@ -205,7 +205,7 @@
       outline: none;
       background: var(--card2);
       color: var(--text);
-      font-size: 22px;
+      font-size: 20px;
       font-weight: 500;
       cursor: pointer;
       display: flex !important;
@@ -698,10 +698,10 @@
 
         <div style="display:flex;gap:8px;margin-bottom:12px">
           <button onclick="document.getElementById('csvImportFile').click()" style="flex:1;padding:10px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-weight:600;cursor:pointer;font-size:13px">📁 Choose CSV File</button>
-          <button onclick="downloadTemplate()" style="flex:1;padding:10px;background:var(--card);color:var(--accent);border:1px solid var(--accent);border-radius:8px;font-weight:600;cursor:pointer;font-size:13px">📥 Download Template</button>
+          <button onclick="downloadTemplate()" style="flex:1;padding:10px;background:var(--card);color:#999;border:none;border-radius:8px;font-weight:600;cursor:pointer;font-size:13px;box-shadow:0 1px 3px rgba(0,0,0,0.1)">📥 Download Template</button>
         </div>
 
-        <button onclick="copyTemplateLink()" style="width:100%;padding:10px;background:var(--card);color:var(--accent);border:1px solid var(--accent);border-radius:8px;font-weight:600;cursor:pointer;font-size:13px;margin-bottom:10px">📋 Copy Template Link</button>
+        <button onclick="copyTemplateLink()" style="width:100%;padding:10px;background:var(--card);color:#999;border:none;border-radius:8px;font-weight:600;cursor:pointer;font-size:13px;margin-bottom:10px;box-shadow:0 1px 3px rgba(0,0,0,0.1)">📋 Copy Template Link</button>
 
         <input type="file" id="csvImportFile" accept=".csv" style="display:none" onchange="handleCSVImport(event)">
 
@@ -710,11 +710,12 @@
 
       <!-- Export, Import, Help buttons (scrollable with content) -->
       <div style="padding:16px;background:var(--card2);border-radius:10px">
+        <h4 style="margin:0 0 10px 0;font-size:13px;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:0.5px">Backup & Help</h4>
         <div style="display:flex;gap:8px;margin-bottom:10px">
           <button onclick="exportData(); return false;" style="flex:1;padding:10px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-weight:600;cursor:pointer;font-size:13px">📥 Export</button>
           <button onclick="document.getElementById('importFile').click(); return false;" style="flex:1;padding:10px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-weight:600;cursor:pointer;font-size:13px">📤 Import</button>
         </div>
-        <button onclick="toggleHelp(); return false;" style="width:100%;padding:10px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-weight:600;cursor:pointer;font-size:13px;margin-bottom:10px">❓ Help</button>
+        <button onclick="toggleHelp(); return false;" style="width:100%;padding:10px;background:var(--card);color:#999;border:none;border-radius:8px;font-weight:600;cursor:pointer;font-size:13px;margin-bottom:10px;box-shadow:0 1px 3px rgba(0,0,0,0.1)">❓ Help</button>
         <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
 
         <div id="helpContent" style="display:none;margin-top:10px;padding:10px;background:var(--bg);border-radius:8px;font-size:12px;line-height:1.5;color:var(--text)">
