@@ -1034,7 +1034,6 @@ function renderCard(item, idx) {
 
   const badges = [];
   if (item.toReview)                badges.push('<span class="badge badge-review">Review</span>');
-  if (item.type !== 'album')        badges.push(`<span class="badge badge-${item.type}">${labelFor(item.type)}</span>`);
 
   const ratingHtml = `<span class="rating">${renderStars(item.rating)}</span>`;
 
