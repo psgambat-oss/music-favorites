@@ -1371,9 +1371,11 @@ function toggleHelp() {
 function renderCategoriesList() {
   const list = document.getElementById('categoriesList');
   list.innerHTML = categories.map((cat, idx) => `
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:8px;background:var(--bg);border-radius:8px;font-size:14px">
-      <span>${esc(cat)}</span>
-      <button onclick="deleteCategory(${idx})" style="background:rgba(255,69,58,0.15);color:var(--red);border:none;padding:6px 10px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer">Delete</button>
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:8px;background:var(--bg);border-radius:8px;font-size:14px" id="cat-row-${idx}">
+      <span id="cat-name-${idx}" onclick="startRenameCategory(${idx})" style="flex:1;cursor:pointer;padding:4px 8px;border-radius:4px;transition:background 0.2s;hover:background:rgba(0,150,200,0.1)">${esc(cat)}</span>
+      <div style="display:flex;gap:6px" id="cat-buttons-${idx}">
+        <button onclick="deleteCategory(${idx})" style="background:rgba(255,69,58,0.15);color:var(--red);border:none;padding:6px 10px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer">Delete</button>
+      </div>
     </div>
   `).join('');
   document.getElementById('newCategoryInput').value = '';
@@ -1400,6 +1402,69 @@ function deleteCategory(idx) {
     renderCategoriesList();
     renderButtonConfig(); // Update button config dropdown when categories change
   }
+}
+
+function startRenameCategory(idx) {
+  const oldName = categories[idx];
+  const nameEl = document.getElementById(`cat-name-${idx}`);
+  const buttonsEl = document.getElementById(`cat-buttons-${idx}`);
+
+  nameEl.innerHTML = `<input type="text" id="rename-input-${idx}" value="${esc(oldName)}" style="width:100%;padding:4px 6px;border:1px solid var(--accent);border-radius:4px;background:var(--bg);color:var(--text);font-size:14px" autocomplete="off">`;
+  buttonsEl.innerHTML = `
+    <button onclick="saveRenameCategory(${idx})" style="background:rgba(0,150,200,0.15);color:var(--accent);border:none;padding:6px 10px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer">Save</button>
+    <button onclick="cancelRenameCategory(${idx})" style="background:rgba(128,128,128,0.15);color:var(--dim);border:none;padding:6px 10px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer">Cancel</button>
+  `;
+
+  const input = document.getElementById(`rename-input-${idx}`);
+  input.focus();
+  input.select();
+
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') saveRenameCategory(${idx});
+    if (e.key === 'Escape') cancelRenameCategory(${idx});
+  });
+}
+
+function saveRenameCategory(idx) {
+  const oldName = categories[idx];
+  const input = document.getElementById(`rename-input-${idx}`);
+  const newName = input.value.trim();
+
+  if (!newName) {
+    alert('Category name cannot be empty');
+    return;
+  }
+
+  if (newName === oldName) {
+    cancelRenameCategory(idx);
+    return;
+  }
+
+  if (categories.includes(newName)) {
+    alert('A category with this name already exists');
+    return;
+  }
+
+  // Update all items with old category name to new category name
+  data.forEach(item => {
+    if (item.category === oldName) {
+      item.category = newName;
+    }
+  });
+
+  // Update category in the array
+  categories[idx] = newName;
+
+  // Save changes
+  saveData();
+  saveCategories();
+  renderCategoriesList();
+  renderButtonConfig();
+  render();
+}
+
+function cancelRenameCategory(idx) {
+  renderCategoriesList();
 }
 
 function renderButtonConfig() {
