@@ -199,13 +199,13 @@
     .section-main {
       width: 100%;
       margin: 0 0 6px 0 !important;
-      padding: 12px 14px !important;
+      padding: 10px 14px !important;
       border-radius: 12px;
       border: none !important;
       outline: none;
       background: var(--card2);
       color: var(--text);
-      font-size: 21px;
+      font-size: 16px;
       font-weight: 500;
       cursor: pointer;
       display: flex !important;
@@ -242,7 +242,7 @@
       color: var(--dim);
       text-transform: uppercase;
       margin: 0;
-      padding: 8px 14px;
+      padding: 6px 14px;
       display: flex;
       align-items: center;
       user-select: none;
@@ -1120,8 +1120,8 @@ function render() {
         if (!artistItems.length) continue;
 
         const artistId = 'artist-' + artist.replace(/\W/g, '');
-        const topBadge = topArtists.includes(artist) ? '<span style="font-size:12px;color:var(--dim);white-space:nowrap;flex-shrink:0">★ TOP ARTIST</span>' : '';
-        html += `<div class="section-label section-main" style="display:flex;align-items:center;gap:8px" onclick="toggleSection('${artistId}')"><span style="font-size:19px">${esc(artist)}</span><div style="display:flex;align-items:center;gap:8px;margin-left:auto">${topBadge}<span class="chevron">›</span></div></div>`;
+        const topBadge = topArtists.includes(artist) ? '<span style="font-size:10px;color:var(--dim);white-space:nowrap;flex-shrink:0">★ TOP ARTIST</span>' : '';
+        html += `<div class="section-label section-main" style="display:flex;align-items:center;gap:8px" onclick="toggleSection('${artistId}')"><span>${esc(artist)}</span><div style="display:flex;align-items:center;gap:8px;margin-left:auto">${topBadge}<span class="chevron">›</span></div></div>`;
 
         const cards = sortItems(artistItems).map((item) => renderCard(item, data.indexOf(item))).join('');
         html += `<div class="section-body collapsed" id="${artistId}">${cards}</div>`;
@@ -1191,7 +1191,7 @@ function render() {
         if (!artistItems.length) continue;
 
         const artistId = 'cat-artist-' + artist.replace(/\W/g, '');
-        const topBadge = topArtists.includes(artist) ? '<span style="font-size:12px;color:var(--dim);white-space:nowrap;flex-shrink:0">★ TOP ARTIST</span>' : '';
+        const topBadge = topArtists.includes(artist) ? '<span style="font-size:10px;color:var(--dim);white-space:nowrap;flex-shrink:0">★ TOP ARTIST</span>' : '';
         html += `<div class="sub-section-label" style="display:flex;align-items:center;gap:8px" onclick="toggleSection('${artistId}')"><span>${esc(artist)}</span><div style="display:flex;align-items:center;gap:8px;margin-left:auto">${topBadge}</div></div>`;
 
         const cards = sortItems(artistItems).map((item) => renderCard(item, data.indexOf(item))).join('');
