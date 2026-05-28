@@ -803,7 +803,7 @@ let data              = [];
 let categories        = [];
 let showAllButton      = true;
 let buttonConfigs      = []; // Array of {category, name} objects for filter buttons
-let sortBy            = 'rating'; // 'rating' or 'artist'
+let sortBy            = 'artist'; // 'rating' or 'artist' - default is artist
 let topArtists        = []; // Array of artist names marked as top
 const STORAGE_KEY = 'music_favorites_v1';
 const CATEGORIES_KEY = 'music_favorites_categories_v1';
@@ -1003,8 +1003,6 @@ function filterItems() {
     // Type/Rating filter
     switch (activeFilter) {
       case 'all':         return true;
-      case 'rating':      return true;  // Show all items, grouped by rating
-      case 'artist':      return true;  // Show all items, grouped by artist
       case 'review':      return item.toReview;
       case 'unrated':     return item.rating === 0 && !item.toReview;
       case 'noUrl':       return !item.url;
@@ -1099,9 +1097,9 @@ function render() {
     return;
   }
 
-  // Show grouped view when: viewing by Rating, Artist, or All filters (not searching or filtered by type/category)
+  // Show grouped view when: in All filter or No Link filter (not searching)
   const isCategoryFilter = activeFilter.startsWith('cat:');
-  const showGrouped = (activeFilter === 'all' || activeFilter === 'rating' || activeFilter === 'artist' || activeFilter === 'noUrl') && !searchQuery && !isCategoryFilter;
+  const showGrouped = (activeFilter === 'all' || activeFilter === 'noUrl') && !searchQuery && !isCategoryFilter;
 
   // Show collapse controls when: grouped view OR category filter view (all show grouped/organized content)
   const showCollapseControls = showGrouped || isCategoryFilter;
@@ -1110,7 +1108,7 @@ function render() {
   let html = `<div class="count-label">${items.length} item${items.length !== 1 ? 's' : ''}</div>`;
 
   if (showGrouped) {
-    if (activeFilter === 'artist' || (activeFilter === 'all' && sortBy === 'artist')) {
+    if (activeFilter === 'all' && sortBy === 'artist') {
       // Group by artist name - top artists first, then alphabetical
       const uniqueArtists = [...new Set(items.map(i => i.artist || 'Unknown'))];
       const topArtistsArray = uniqueArtists.filter(a => topArtists.includes(a)).sort();
@@ -1180,23 +1178,44 @@ function render() {
       }
     }
   } else if (isCategoryFilter) {
-    // Group by rating within the selected category
-    const ratingGroups = [
-      { label: 'Five (5) <span style="color:var(--dim)">★</span>', fn: i => i.rating === 5 },
-      { label: 'Four (4) <span style="color:var(--dim)">★</span>', fn: i => i.rating === 4 },
-      { label: 'Three (3) <span style="color:var(--dim)">★</span>', fn: i => i.rating === 3 },
-      { label: 'Two (2) <span style="color:var(--dim)">★</span>', fn: i => i.rating === 2 },
-      { label: 'One (1) <span style="color:var(--dim)">★</span>', fn: i => i.rating === 1 },
-      { label: 'No Rating', fn: i => i.rating === 0 }
-    ];
+    // Group by artist or rating within the selected category based on sortBy
+    if (sortBy === 'artist') {
+      // Group by artist within category
+      const uniqueArtists = [...new Set(items.map(i => i.artist || 'Unknown'))];
+      const topArtistsArray = uniqueArtists.filter(a => topArtists.includes(a)).sort();
+      const otherArtistsArray = uniqueArtists.filter(a => !topArtists.includes(a)).sort();
+      const sortedArtists = [...topArtistsArray, ...otherArtistsArray];
 
-    for (const rg of ratingGroups) {
-      const sub = sortItems(items.filter(rg.fn));
-      if (!sub.length) continue;
-      const ratingId = 'rating-' + rg.label.replace(/\W/g, '');
-      const cards = sub.map((item) => renderCard(item, data.indexOf(item))).join('');
-      html += `<div class="sub-section-label" onclick="toggleSection('${ratingId}')">${rg.label}</div>`;
-      html += `<div class="section-body" id="${ratingId}">${cards}</div>`;
+      for (const artist of sortedArtists) {
+        const artistItems = items.filter(i => (i.artist || 'Unknown') === artist);
+        if (!artistItems.length) continue;
+
+        const artistId = 'cat-artist-' + artist.replace(/\W/g, '');
+        const topBadge = topArtists.includes(artist) ? '<span style="font-size:12px;color:var(--dim);white-space:nowrap;flex-shrink:0">★ TOP ARTIST</span>' : '';
+        html += `<div class="sub-section-label" style="display:flex;align-items:center;gap:8px" onclick="toggleSection('${artistId}')"><span>${esc(artist)}</span><div style="display:flex;align-items:center;gap:8px;margin-left:auto">${topBadge}</div></div>`;
+
+        const cards = sortItems(artistItems).map((item) => renderCard(item, data.indexOf(item))).join('');
+        html += `<div class="section-body" id="${artistId}">${cards}</div>`;
+      }
+    } else {
+      // Group by rating within the selected category
+      const ratingGroups = [
+        { label: 'Five (5) <span style="color:var(--dim)">★</span>', fn: i => i.rating === 5 },
+        { label: 'Four (4) <span style="color:var(--dim)">★</span>', fn: i => i.rating === 4 },
+        { label: 'Three (3) <span style="color:var(--dim)">★</span>', fn: i => i.rating === 3 },
+        { label: 'Two (2) <span style="color:var(--dim)">★</span>', fn: i => i.rating === 2 },
+        { label: 'One (1) <span style="color:var(--dim)">★</span>', fn: i => i.rating === 1 },
+        { label: 'No Rating', fn: i => i.rating === 0 }
+      ];
+
+      for (const rg of ratingGroups) {
+        const sub = sortItems(items.filter(rg.fn));
+        if (!sub.length) continue;
+        const ratingId = 'rating-' + rg.label.replace(/\W/g, '');
+        const cards = sub.map((item) => renderCard(item, data.indexOf(item))).join('');
+        html += `<div class="sub-section-label" onclick="toggleSection('${ratingId}')">${rg.label}</div>`;
+        html += `<div class="section-body" id="${ratingId}">${cards}</div>`;
+      }
     }
   } else {
     // Show items in simple list (when searching or filtering by type)
@@ -1254,42 +1273,66 @@ function renderSortToggle() {
   const el = document.getElementById('sortToggle');
   if (!el) return;
 
-  // Show when viewing "All" or a category filter (all show grouped content)
-  // Hide when searching or filtering by type
+  // Show when viewing "All" or a category filter + sort toggle OR when in No Link filter
+  // Hide when searching
   const isCategoryFilter = activeFilter.startsWith('cat:');
-  const shouldShow = (activeFilter === 'all' || activeFilter === 'rating' || activeFilter === 'artist' || activeFilter === 'noUrl' || isCategoryFilter) && !searchQuery;
+  const isRatingArtistMode = (activeFilter === 'all' || isCategoryFilter);
+  const shouldShow = (isRatingArtistMode || activeFilter === 'noUrl') && !searchQuery;
 
   if (!shouldShow) {
     el.style.display = 'none';
     return;
   }
 
-  // Three mutually exclusive filter options: Rating, Artist, or No Link
-  const noLinkCount = data.filter(item => !item.url).length;
+  // Handle Rating/Artist sort toggles (when in All or category filter views)
+  let ratingSpan = '';
+  let artistSpan = '';
+  if (isRatingArtistMode) {
+    const ratingActive = sortBy === 'rating';
+    const artistActive = sortBy === 'artist';
 
-  const ratingSpan = activeFilter === 'rating'
-    ? `<span class="sort-toggle-item active" onclick="setFilter('all')">Rating</span>`
-    : `<span class="sort-toggle-item inactive" onclick="setFilter('rating')">Rating</span>`;
+    ratingSpan = ratingActive
+      ? `<span class="sort-toggle-item active" onclick="setSortMode('artist')">Rating</span>`
+      : `<span class="sort-toggle-item inactive" onclick="setSortMode('rating')">Rating</span>`;
 
-  const artistSpan = activeFilter === 'artist'
-    ? `<span class="sort-toggle-item active" onclick="setFilter('all')">Artist</span>`
-    : `<span class="sort-toggle-item inactive" onclick="setFilter('artist')">Artist</span>`;
+    artistSpan = artistActive
+      ? `<span class="sort-toggle-item active" onclick="setSortMode('rating')">Artist</span>`
+      : `<span class="sort-toggle-item inactive" onclick="setSortMode('artist')">Artist</span>`;
+  }
 
-  const noLinkSpan = noLinkCount > 0
-    ? `<span class="sort-toggle-separator">•</span><span class="sort-toggle-item${activeFilter === 'noUrl' ? ' active' : ' inactive'}" onclick="setFilter('${activeFilter === 'noUrl' ? 'all' : 'noUrl'}')" title="Items without audio links">No Link (${noLinkCount})</span>`
+  // No Link filter (only shows when in All view AND has items without URLs)
+  const noLinkSpan = activeFilter === 'all'
+    ? (() => {
+        const noLinkCount = data.filter(item => !item.url).length;
+        return noLinkCount > 0
+          ? `<span class="sort-toggle-separator">•</span><span class="sort-toggle-item inactive" onclick="setFilter('noUrl')" title="Items without audio links">No Link (${noLinkCount})</span>`
+          : '';
+      })()
     : '';
 
-  el.innerHTML = `${ratingSpan}<span class="sort-toggle-separator">•</span>${artistSpan}${noLinkSpan}`;
+  if (isRatingArtistMode) {
+    el.innerHTML = `${ratingSpan}<span class="sort-toggle-separator">•</span>${artistSpan}${noLinkSpan}`;
+  } else if (activeFilter === 'noUrl') {
+    // When in No Link view, offer to go back to All
+    el.innerHTML = `<span class="sort-toggle-item inactive" onclick="setFilter('all')">← Back to All</span>`;
+  }
+
   el.style.display = 'flex';
+}
+
+function setSortMode(mode) {
+  sortBy = mode;
+  saveSortPreference();
+  render();
 }
 
 // ─── FILTERS BAR ─────────────────────────────────────────────────────────────
 function renderFilters() {
   let buttons = [];
 
-  // Add "All" button if enabled - stays active for all filter types (all, rating, artist, noUrl)
+  // Add "All" button if enabled - stays active for All view and No Link filter
   if (showAllButton) {
-    const isAllActive = activeFilter === 'all' || activeFilter === 'rating' || activeFilter === 'artist' || activeFilter === 'noUrl';
+    const isAllActive = activeFilter === 'all' || activeFilter === 'noUrl';
     buttons.push(`<button class="chip${isAllActive ? ' active' : ''}" onclick="setFilter('all')">All</button>`);
   }
 
