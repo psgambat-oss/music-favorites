@@ -212,6 +212,7 @@
       cursor: pointer;
       display: flex !important;
       align-items: center;
+      justify-content: flex-start;
       gap: 8px;
       transition: all 0.15s;
       font-family: inherit;
@@ -247,6 +248,7 @@
       padding: 6px 14px;
       display: flex;
       align-items: center;
+      justify-content: flex-start;
       gap: 8px;
       user-select: none;
       background: transparent;
@@ -1124,7 +1126,7 @@ function render() {
 
         const artistId = 'artist-' + artist.replace(/\W/g, '');
         const topBadge = topArtists.includes(artist) ? '<span style="font-size:10px;color:var(--dim);white-space:nowrap;flex-shrink:0">★ TOP ARTIST</span>' : '';
-        html += `<div class="section-label section-main" style="display:flex;align-items:center;gap:8px" onclick="toggleSection('${artistId}')"><span class="chevron">›</span><span>${esc(artist)}</span><div style="display:flex;align-items:center;gap:8px;margin-left:auto">${topBadge}</div></div>`;
+        html += `<div class="section-label section-main collapsed" style="display:flex;align-items:center;gap:8px" onclick="toggleSection('${artistId}')"><span class="chevron">›</span><span>${esc(artist)}</span><div style="display:flex;align-items:center;gap:8px;margin-left:auto">${topBadge}</div></div>`;
 
         const cards = sortItems(artistItems).map((item) => renderCard(item, data.indexOf(item))).join('');
         html += `<div class="section-body collapsed" id="${artistId}">${cards}</div>`;
@@ -1145,8 +1147,8 @@ function render() {
         if (!sub.length) continue;
         const ratingId = 'nourl-rating-' + rg.label.replace(/\W/g, '');
         const cards = sub.map((item) => renderCard(item, data.indexOf(item))).join('');
-        html += `<div class="sub-section-label" onclick="toggleSection('${ratingId}')"><span class="chevron">›</span>${rg.label}</div>`;
-        html += `<div class="section-body" id="${ratingId}">${cards}</div>`;
+        html += `<div class="sub-section-label collapsed" onclick="toggleSection('${ratingId}')"><span class="chevron">›</span>${rg.label}</div>`;
+        html += `<div class="section-body collapsed" id="${ratingId}">${cards}</div>`;
       }
     } else {
       // Group by user-created categories, then by rating within each category (for "all" with rating sort)
@@ -1173,8 +1175,8 @@ function render() {
           if (!sub.length) continue;
           const subId = catId + '-' + rg.label.replace(/\W/g, '');
           const cards = sub.map((item) => renderCard(item, data.indexOf(item))).join('');
-          catContent += `<div class="sub-section-label" onclick="toggleSection('${subId}')"><span class="chevron">›</span>${rg.label}</div>`;
-          catContent += `<div class="section-body" id="${subId}">${cards}</div>`;
+          catContent += `<div class="sub-section-label collapsed" onclick="toggleSection('${subId}')"><span class="chevron">›</span>${rg.label}</div>`;
+          catContent += `<div class="section-body collapsed" id="${subId}">${cards}</div>`;
         }
 
         html += `<div class="section-body collapsed" id="${catId}">${catContent}</div>`;
@@ -1195,10 +1197,10 @@ function render() {
 
         const artistId = 'cat-artist-' + artist.replace(/\W/g, '');
         const topBadge = topArtists.includes(artist) ? '<span style="font-size:10px;color:var(--dim);white-space:nowrap;flex-shrink:0">★ TOP ARTIST</span>' : '';
-        html += `<div class="sub-section-label" style="display:flex;align-items:center;gap:8px;${activeFilter === 'all' ? '' : 'color: var(--dim)'}" onclick="toggleSection('${artistId}')"><span class="chevron">›</span><span>${esc(artist)}</span><div style="display:flex;align-items:center;gap:8px;margin-left:auto">${topBadge}</div></div>`;
+        html += `<div class="sub-section-label collapsed" style="display:flex;align-items:center;gap:8px;${activeFilter === 'all' ? '' : 'color: var(--dim)'}" onclick="toggleSection('${artistId}')"><span class="chevron">›</span><span>${esc(artist)}</span><div style="display:flex;align-items:center;gap:8px;margin-left:auto">${topBadge}</div></div>`;
 
         const cards = sortItems(artistItems).map((item) => renderCard(item, data.indexOf(item))).join('');
-        html += `<div class="section-body" id="${artistId}">${cards}</div>`;
+        html += `<div class="section-body collapsed" id="${artistId}">${cards}</div>`;
       }
     } else {
       // Group by rating within the selected category
@@ -1216,8 +1218,8 @@ function render() {
         if (!sub.length) continue;
         const ratingId = 'rating-' + rg.label.replace(/\W/g, '');
         const cards = sub.map((item) => renderCard(item, data.indexOf(item))).join('');
-        html += `<div class="sub-section-label" onclick="toggleSection('${ratingId}')"><span class="chevron">›</span>${rg.label}</div>`;
-        html += `<div class="section-body" id="${ratingId}">${cards}</div>`;
+        html += `<div class="sub-section-label collapsed" onclick="toggleSection('${ratingId}')"><span class="chevron">›</span>${rg.label}</div>`;
+        html += `<div class="section-body collapsed" id="${ratingId}">${cards}</div>`;
       }
     }
   } else {
