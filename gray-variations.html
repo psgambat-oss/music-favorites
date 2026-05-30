@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Gray Variations Mockup</title>
+  <style>
+    :root {
+      --bg:     #0a0a0a;
+      --card:   #1a1a1a;
+      --card2:  #252525;
+      --accent: #17a2b8;
+      --text:   #f5f5f5;
+      --dim:    #7a7a7a;
+      --border: #2a2a2a;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif;
+      padding: 16px;
+    }
+    h1 { font-size: 18px; margin-bottom: 24px; color: var(--dim); }
+    .section { margin-bottom: 28px; }
+    .option-title {
+      font-size: 12px;
+      color: var(--dim);
+      margin-bottom: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .sub-section-label {
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      margin: 0;
+      padding: 6px 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      user-select: none;
+      background: transparent;
+      border-radius: 0;
+      border-top: 1px solid var(--border);
+      cursor: pointer;
+    }
+
+    .top-badge {
+      font-size: 10px;
+      white-space: nowrap;
+      flex-shrink: 0;
+      margin-left: auto;
+    }
+
+    .stars { letter-spacing: 2px; font-size: 15px; }
+    .stars-outline { }
+
+    /* OPTION A: Med gray text, Light gray stars, Light gray badge */
+    .optA { color: #9a9a9c; }
+    .optA .stars { color: #b8b8ba; }
+    .optA .stars-outline { color: #3a3a3c; }
+    .optA .top-badge { color: #b8b8ba; }
+
+    /* OPTION B: Med gray text, Dim gray stars, Dim gray badge */
+    .optB { color: #9a9a9c; }
+    .optB .stars { color: #7a7a7a; }
+    .optB .stars-outline { color: #3a3a3c; }
+    .optB .top-badge { color: #7a7a7a; }
+
+    /* OPTION C: Med gray text, Light gray stars, Dim gray badge */
+    .optC { color: #9a9a9c; }
+    .optC .stars { color: #b8b8ba; }
+    .optC .stars-outline { color: #3a3a3c; }
+    .optC .top-badge { color: #7a7a7a; }
+  </style>
+</head>
+<body>
+
+<h1>Gray Variations: Text vs Stars vs Badge</h1>
+
+<!-- OPTION A -->
+<div class="section">
+  <div class="option-title">Option A: Med Gray Text + Light Gray Stars + Light Gray Badge</div>
+  <div class="sub-section-label optA">
+    › FIVE (5) <span class="stars">★ ★ ★ ★ ★</span>
+  </div>
+  <div class="sub-section-label optA" style="display:flex;align-items:center;gap:8px">
+    › BILLIE EILISH <span class="top-badge">★ TOP ARTIST</span>
+  </div>
+  <div class="sub-section-label optA">
+    › FOUR (4) <span class="stars">★ ★ ★ ★ <span class="stars-outline">☆</span></span>
+  </div>
+</div>
+
+<!-- OPTION B -->
+<div class="section">
+  <div class="option-title">Option B: Med Gray Text + Dim Gray Stars + Dim Gray Badge</div>
+  <div class="sub-section-label optB">
+    › FIVE (5) <span class="stars">★ ★ ★ ★ ★</span>
+  </div>
+  <div class="sub-section-label optB" style="display:flex;align-items:center;gap:8px">
+    › BILLIE EILISH <span class="top-badge">★ TOP ARTIST</span>
+  </div>
+  <div class="sub-section-label optB">
+    › FOUR (4) <span class="stars">★ ★ ★ ★ <span class="stars-outline">☆</span></span>
+  </div>
+</div>
+
+<!-- OPTION C -->
+<div class="section">
+  <div class="option-title">Option C: Med Gray Text + Light Gray Stars + Dim Gray Badge</div>
+  <div class="sub-section-label optC">
+    › FIVE (5) <span class="stars">★ ★ ★ ★ ★</span>
+  </div>
+  <div class="sub-section-label optC" style="display:flex;align-items:center;gap:8px">
+    › BILLIE EILISH <span class="top-badge">★ TOP ARTIST</span>
+  </div>
+  <div class="sub-section-label optC">
+    › FOUR (4) <span class="stars">★ ★ ★ ★ <span class="stars-outline">☆</span></span>
+  </div>
+</div>
+
+</body>
+</html>

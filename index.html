@@ -242,7 +242,7 @@
       font-size: 16px;
       font-weight: 700;
       letter-spacing: 1.5px;
-      color: var(--text);
+      color: #a0a0a2;
       text-transform: uppercase;
       margin: 0;
       padding: 6px 14px;
@@ -1069,7 +1069,7 @@ function renderGrayStars(rating) {
 function ratingHeaderStars(n) {
   let s = '';
   for (let i = 1; i <= 5; i++) {
-    s += `<span style="color:${i <= n ? '#7a7a7a' : '#3a3a3c'};font-size:15px;letter-spacing:2px">${i <= n ? '★' : '☆'}</span>`;
+    s += `<span style="color:${i <= n ? '#3a3a3c' : '#1a1a1c'};font-size:15px;letter-spacing:2px">${i <= n ? '★' : '☆'}</span>`;
   }
   return s;
 }
@@ -1178,7 +1178,7 @@ function render() {
         if (!artistItems.length) continue;
 
         const artistId = 'artist-' + artist.replace(/\W/g, '');
-        const topBadge = topArtists.includes(artist) ? '<span style="font-size:10px;color:var(--dim);white-space:nowrap;flex-shrink:0">★ TOP ARTIST</span>' : '';
+        const topBadge = topArtists.includes(artist) ? '<span style="font-size:10px;color:#5a5a5c;white-space:nowrap;flex-shrink:0">★ TOP ARTIST</span>' : '';
         html += `<div class="sub-section-label collapsed" style="display:flex;align-items:center;gap:8px" onclick="toggleSection('${artistId}')"><span class="chevron">›</span><span>${esc(artist)}</span><div style="display:flex;align-items:center;gap:8px;margin-left:auto">${topBadge}</div></div>`;
 
         const cards = sortItems(artistItems).map((item) => renderCard(item, data.indexOf(item))).join('');
@@ -1231,7 +1231,7 @@ function render() {
         if (!artistItems.length) continue;
 
         const artistId = 'cat-artist-' + artist.replace(/\W/g, '');
-        const topBadge = topArtists.includes(artist) ? '<span style="font-size:10px;color:var(--dim);white-space:nowrap;flex-shrink:0">★ TOP ARTIST</span>' : '';
+        const topBadge = topArtists.includes(artist) ? '<span style="font-size:10px;color:#5a5a5c;white-space:nowrap;flex-shrink:0">★ TOP ARTIST</span>' : '';
         html += `<div class="sub-section-label collapsed" style="display:flex;align-items:center;gap:8px" onclick="toggleSection('${artistId}')"><span class="chevron">›</span><span>${esc(artist)}</span><div style="display:flex;align-items:center;gap:8px;margin-left:auto">${topBadge}</div></div>`;
 
         const cards = sortItems(artistItems).map((item) => renderCard(item, data.indexOf(item))).join('');

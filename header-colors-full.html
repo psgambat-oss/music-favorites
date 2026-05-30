@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Sub-Header Color Comparison</title>
+  <style>
+    :root {
+      --bg:     #0a0a0a;
+      --card:   #1a1a1a;
+      --card2:  #252525;
+      --accent: #17a2b8;
+      --text:   #f5f5f5;
+      --dim:    #7a7a7a;
+      --border: #2a2a2a;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif;
+      padding: 16px;
+    }
+    .section { margin-bottom: 32px; }
+    .option-title {
+      font-size: 14px;
+      color: var(--accent);
+      margin-bottom: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .sub-section-label {
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      margin: 0;
+      padding: 6px 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      user-select: none;
+      background: transparent;
+      border-radius: 0;
+      border-top: 1px solid var(--border);
+      cursor: pointer;
+    }
+
+    .card {
+      background: transparent;
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid #1e1e1e;
+    }
+    .card-icon {
+      width: 46px;
+      height: 46px;
+      border-radius: 8px;
+      background: var(--card2);
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+    }
+    .card-body { flex: 1; min-width: 0; }
+    .card-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #2596D6;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .card-artist {
+      font-size: 13px;
+      color: var(--text);
+      margin-top: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .card-meta {
+      font-size: 12px;
+      color: var(--dim);
+      margin-top: 3px;
+    }
+    .stars { letter-spacing: 1px; }
+
+    /* Color options */
+    .opt-bright-white { color: #f5f5f5; }
+    .opt-teal { color: #17a2b8; }
+    .opt-light-gray { color: #b8b8ba; }
+    .opt-soft-cyan { color: #66d9ef; }
+    .opt-muted-teal { color: #4fb3c9; }
+    .opt-off-white { color: #e8e8e8; }
+    .opt-medium-gray { color: #9a9a9c; }
+  </style>
+</head>
+<body>
+
+<h1 style="font-size:18px;margin-bottom:24px;color:var(--dim)">Sub-Header Color Options</h1>
+
+<!-- Option 1: Bright White -->
+<div class="section">
+  <div class="option-title">Option 1: Bright White (Current)</div>
+  <div class="sub-section-label opt-bright-white">› FIVE (5) <span class="stars">★ ★ ★ ★ ★</span></div>
+  <div class="card">
+    <div class="card-icon">💿</div>
+    <div class="card-body">
+      <div class="card-title">HIT ME HARD AND SOFT</div>
+      <div class="card-artist">Billie Eilish</div>
+      <div class="card-meta">2024 · <span class="stars">★ ★ ★ ★ ★</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- Option 2: Teal Accent -->
+<div class="section">
+  <div class="option-title">Option 2: Teal Accent (App Theme)</div>
+  <div class="sub-section-label opt-teal">› FIVE (5) <span class="stars">★ ★ ★ ★ ★</span></div>
+  <div class="card">
+    <div class="card-icon">💿</div>
+    <div class="card-body">
+      <div class="card-title">HIT ME HARD AND SOFT</div>
+      <div class="card-artist">Billie Eilish</div>
+      <div class="card-meta">2024 · <span class="stars">★ ★ ★ ★ ★</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- Option 3: Light Gray -->
+<div class="section">
+  <div class="option-title">Option 3: Light Gray (Softer)</div>
+  <div class="sub-section-label opt-light-gray">› FIVE (5) <span class="stars">★ ★ ★ ★ ★</span></div>
+  <div class="card">
+    <div class="card-icon">💿</div>
+    <div class="card-body">
+      <div class="card-title">HIT ME HARD AND SOFT</div>
+      <div class="card-artist">Billie Eilish</div>
+      <div class="card-meta">2024 · <span class="stars">★ ★ ★ ★ ★</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- Option 4: Soft Cyan -->
+<div class="section">
+  <div class="option-title">Option 4: Soft Cyan (Cool Blue)</div>
+  <div class="sub-section-label opt-soft-cyan">› FIVE (5) <span class="stars">★ ★ ★ ★ ★</span></div>
+  <div class="card">
+    <div class="card-icon">💿</div>
+    <div class="card-body">
+      <div class="card-title">HIT ME HARD AND SOFT</div>
+      <div class="card-artist">Billie Eilish</div>
+      <div class="card-meta">2024 · <span class="stars">★ ★ ★ ★ ★</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- Option 5: Muted Teal -->
+<div class="section">
+  <div class="option-title">Option 5: Muted Teal (Softer Accent)</div>
+  <div class="sub-section-label opt-muted-teal">› FIVE (5) <span class="stars">★ ★ ★ ★ ★</span></div>
+  <div class="card">
+    <div class="card-icon">💿</div>
+    <div class="card-body">
+      <div class="card-title">HIT ME HARD AND SOFT</div>
+      <div class="card-artist">Billie Eilish</div>
+      <div class="card-meta">2024 · <span class="stars">★ ★ ★ ★ ★</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- Option 6: Off-White -->
+<div class="section">
+  <div class="option-title">Option 6: Off-White/Cream</div>
+  <div class="sub-section-label opt-off-white">› FIVE (5) <span class="stars">★ ★ ★ ★ ★</span></div>
+  <div class="card">
+    <div class="card-icon">💿</div>
+    <div class="card-body">
+      <div class="card-title">HIT ME HARD AND SOFT</div>
+      <div class="card-artist">Billie Eilish</div>
+      <div class="card-meta">2024 · <span class="stars">★ ★ ★ ★ ★</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- Option 7: Medium Gray -->
+<div class="section">
+  <div class="option-title">Option 7: Medium Gray (New)</div>
+  <div class="sub-section-label opt-medium-gray">› FIVE (5) <span class="stars">★ ★ ★ ★ ★</span></div>
+  <div class="card">
+    <div class="card-icon">💿</div>
+    <div class="card-body">
+      <div class="card-title">HIT ME HARD AND SOFT</div>
+      <div class="card-artist">Billie Eilish</div>
+      <div class="card-meta">2024 · <span class="stars">★ ★ ★ ★ ★</span></div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

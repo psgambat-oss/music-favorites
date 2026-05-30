@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Much Darker Gray Options</title>
+  <style>
+    :root {
+      --bg:     #0a0a0a;
+      --card:   #1a1a1a;
+      --card2:  #252525;
+      --accent: #17a2b8;
+      --text:   #f5f5f5;
+      --dim:    #7a7a7a;
+      --border: #2a2a2a;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif;
+      padding: 16px;
+    }
+    h1 { font-size: 18px; margin-bottom: 8px; color: var(--dim); }
+    .note {
+      font-size: 12px;
+      color: #666;
+      margin-bottom: 24px;
+    }
+    .section { margin-bottom: 24px; }
+    .option-title {
+      font-size: 12px;
+      color: var(--dim);
+      margin-bottom: 8px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .sub-section-label {
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      margin: 0;
+      padding: 6px 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      user-select: none;
+      background: transparent;
+      border-radius: 0;
+      border-top: 1px solid var(--border);
+      cursor: pointer;
+    }
+
+    .stars { letter-spacing: 2px; font-size: 15px; color: #4a4a4c; }
+    .stars-outline { color: #2a2a2c; }
+
+    /* Much darker grays (but lighter than stars #4a4a4c) */
+    .opt1 { color: #a0a0a2; }
+    .opt2 { color: #989898; }
+    .opt3 { color: #909090; }
+    .opt4 { color: #888888; }
+  </style>
+</head>
+<body>
+
+<h1>Much Darker Gray Options</h1>
+<p class="note">Stars are #4a4a4c (reference)</p>
+
+<div class="section">
+  <div class="option-title">Option 1: #a0a0a2 (Slightly darker)</div>
+  <div class="sub-section-label opt1">› FIVE (5) <span class="stars">★ ★ ★ ★ ★</span></div>
+  <div class="sub-section-label opt1">› FOUR (4) <span class="stars">★ ★ ★ ★ <span class="stars-outline">☆</span></span></div>
+</div>
+
+<div class="section">
+  <div class="option-title">Option 2: #989898 (Medium darker)</div>
+  <div class="sub-section-label opt2">› FIVE (5) <span class="stars">★ ★ ★ ★ ★</span></div>
+  <div class="sub-section-label opt2">› FOUR (4) <span class="stars">★ ★ ★ ★ <span class="stars-outline">☆</span></span></div>
+</div>
+
+<div class="section">
+  <div class="option-title">Option 3: #909090 (Much darker)</div>
+  <div class="sub-section-label opt3">› FIVE (5) <span class="stars">★ ★ ★ ★ ★</span></div>
+  <div class="sub-section-label opt3">› FOUR (4) <span class="stars">★ ★ ★ ★ <span class="stars-outline">☆</span></span></div>
+</div>
+
+<div class="section">
+  <div class="option-title">Option 4: #888888 (Very dark but lighter than stars)</div>
+  <div class="sub-section-label opt4">› FIVE (5) <span class="stars">★ ★ ★ ★ ★</span></div>
+  <div class="sub-section-label opt4">› FOUR (4) <span class="stars">★ ★ ★ ★ <span class="stars-outline">☆</span></span></div>
+</div>
+
+</body>
+</html>

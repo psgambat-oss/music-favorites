@@ -1,5 +1,12 @@
 # My Music Library — Changelog
 
+## v2.8 — 2026-05-30
+- **Header and rating styling refinements**
+  - Sub-header text color changed to dark gray (#a0a0a2) for softer appearance
+  - Rating stars darkened (#3a3a3c filled, #1a1a1c outline) for better distinction
+  - Top artist badge darkened (#5a5a5c) for visual hierarchy
+  - Maintains good contrast while reducing eye strain
+
 ## v2.7 — 2026-05-30
 - **Card redesign: album art + new layout**
   - Album art (46px square) replaces emoji icon — fetched from iTunes when URL is present

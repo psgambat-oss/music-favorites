@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Sub-Header Color Mockups</title>
+  <style>
+    :root {
+      --bg:     #0a0a0a;
+      --card:   #1a1a1a;
+      --card2:  #252525;
+      --accent: #17a2b8;
+      --text:   #f5f5f5;
+      --dim:    #7a7a7a;
+      --border: #2a2a2a;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif;
+      padding: 16px;
+    }
+    h1 { font-size: 16px; margin-bottom: 20px; color: var(--dim); }
+    .option { margin-bottom: 24px; }
+    .label { font-size: 12px; color: var(--dim); margin-bottom: 8px; text-transform: uppercase; font-weight: 600; }
+
+    .sub-section-label {
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      margin: 0;
+      padding: 6px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 8px;
+      user-select: none;
+      background: transparent;
+      border-radius: 0;
+      border-top: 1px solid var(--border);
+      cursor: pointer;
+    }
+
+    /* Option 1: Current (bright white) */
+    .opt1 { color: var(--text); }
+
+    /* Option 2: Teal accent (matches app theme) */
+    .opt2 { color: var(--accent); }
+
+    /* Option 3: Light gray */
+    .opt3 { color: #b8b8ba; }
+
+    /* Option 4: Soft cyan/light blue */
+    .opt4 { color: #66d9ef; }
+
+    /* Option 5: Muted teal */
+    .opt5 { color: #4fb3c9; }
+
+    /* Option 6: Off-white/cream */
+    .opt6 { color: #e8e8e8; }
+
+    .stars { color: var(--dim); letter-spacing: 2px; font-size: 15px; }
+  </style>
+</head>
+<body>
+
+<h1>Sub-Header Color Options</h1>
+
+<div class="option">
+  <div class="label">Option 1: Current (Bright White)</div>
+  <div class="sub-section-label opt1">› FIVE (5) <span class="stars">★ ★ ★ ★ ★</span></div>
+  <div class="sub-section-label opt1">› FOUR (4) <span class="stars">★ ★ ★ ★ ☆</span></div>
+</div>
+
+<div class="option">
+  <div class="label">Option 2: Teal Accent (Matches App Theme)</div>
+  <div class="sub-section-label opt2">› FIVE (5) <span class="stars">★ ★ ★ ★ ★</span></div>
+  <div class="sub-section-label opt2">› FOUR (4) <span class="stars">★ ★ ★ ★ ☆</span></div>
+</div>
+
+<div class="option">
+  <div class="label">Option 3: Light Gray</div>
+  <div class="sub-section-label opt3">› FIVE (5) <span class="stars">★ ★ ★ ★ ★</span></div>
+  <div class="sub-section-label opt3">› FOUR (4) <span class="stars">★ ★ ★ ★ ☆</span></div>
+</div>
+
+<div class="option">
+  <div class="label">Option 4: Soft Cyan</div>
+  <div class="sub-section-label opt4">› FIVE (5) <span class="stars">★ ★ ★ ★ ★</span></div>
+  <div class="sub-section-label opt4">› FOUR (4) <span class="stars">★ ★ ★ ★ ☆</span></div>
+</div>
+
+<div class="option">
+  <div class="label">Option 5: Muted Teal</div>
+  <div class="sub-section-label opt5">› FIVE (5) <span class="stars">★ ★ ★ ★ ★</span></div>
+  <div class="sub-section-label opt5">› FOUR (4) <span class="stars">★ ★ ★ ★ ☆</span></div>
+</div>
+
+<div class="option">
+  <div class="label">Option 6: Off-White/Cream</div>
+  <div class="sub-section-label opt6">› FIVE (5) <span class="stars">★ ★ ★ ★ ★</span></div>
+  <div class="sub-section-label opt6">› FOUR (4) <span class="stars">★ ★ ★ ★ ☆</span></div>
+</div>
+
+</body>
+</html>
