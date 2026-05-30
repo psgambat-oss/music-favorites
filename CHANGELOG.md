@@ -1,5 +1,12 @@
 # My Music Library — Changelog
 
+## v2.4 — 2026-05-29
+- **UI improvements: Section alignment and default collapse state**
+  - Added explicit `justify-content: flex-start` to `.section-main` and `.sub-section-label` for consistent left alignment
+  - All sections now render as collapsed by default when entering filters
+  - Cleaner interface: users can expand sections individually or use "Expand All" button
+  - Chevrons properly indicate collapsed/expanded state
+
 ## v2.3 — 2026-05-29
 - **UI refinement: Left-aligned chevron indicators**
   - Moved chevron icons (›) to left side of all expandable headers for more conventional UI pattern
