@@ -541,7 +541,7 @@
     }
     .modal-input {
       width: 100%;
-      padding: 12px;
+      padding: 7px 12px;
       border: 1px solid var(--border);
       border-radius: 10px;
       background: var(--card2);
@@ -566,6 +566,8 @@
       font-weight: 700;
       cursor: pointer;
       text-align: center;
+      align-items: center;
+      justify-content: center;
       pointer-events: auto;
     }
     .modal-btn.cancel { background: var(--card2); color: var(--text); }
@@ -674,17 +676,22 @@
       </select>
     </div>
     <div class="modal-field">
-      <label>Year</label>
-      <input type="number" class="modal-input" id="modalYear" placeholder="Leave empty if unknown" min="1900" max="2999">
-    </div>
-    <div class="modal-field">
       <label>RATING (1-5 STARS ★)</label>
-      <input type="number" class="modal-input" id="modalRating" placeholder="1-5" min="1" max="5" value="1" onchange="updateRatingDisplay()">
-      <div id="ratingDisplay" style="font-size:13px;color:var(--dim);margin-top:6px;font-weight:500"></div>
+      <input type="text" class="modal-input" id="modalRating" placeholder="1–5 or one–five" autocomplete="off"
+        onfocus="ratingFieldFocus()" onblur="ratingFieldBlur()" oninput="ratingFieldInput()">
+      <input type="hidden" id="modalRatingVal" value="4">
+    </div>
+    <hr style="border:none;border-top:1px solid #484848;margin:12px 0 4px;">
+    <div class="modal-field">
+      <label style="display:flex;justify-content:space-between;align-items:center;">
+        <span>Year</span>
+        <span style="font-weight:400;font-size:11px;color:var(--dim);text-transform:none;letter-spacing:0;">(optional)</span>
+      </label>
+      <input type="number" class="modal-input" id="modalYear" placeholder="Year" min="1900" max="2999">
     </div>
     <div class="modal-field">
-      <label>MUSIC OR AUDIO LINK (OPTIONAL)</label>
-      <input type="url" class="modal-input" id="modalUrl" placeholder="https://music.apple.com or any audio link" autocomplete="off">
+      <label>Music or Audio Link</label>
+      <input type="url" class="modal-input" id="modalUrl" placeholder="Music or audio URL" autocomplete="off">
     </div>
     <div class="modal-actions">
       <button class="modal-btn cancel" onclick="closeModal()">Cancel</button>
@@ -1407,22 +1414,49 @@ function openAddModal() {
   document.getElementById('modalCategory').value = '';
   document.getElementById('modalType').value = 'album';
   document.getElementById('modalYear').value = '';
-  document.getElementById('modalRating').value = '4';
+  document.getElementById('modalRatingVal').value = '5';
+  document.getElementById('modalRating').value = formatRatingField(5);
   document.getElementById('modalUrl').value = '';
   document.getElementById('deleteBtn').style.display = 'none';
   document.getElementById('modalOverlay').classList.add('show');
-  updateRatingDisplay();
+}
+
+const RATING_WORDS = { one:1, two:2, three:3, four:4, five:5 };
+const RATING_LABELS = ['', 'ONE (1)', 'TWO (2)', 'THREE (3)', 'FOUR (4)', 'FIVE (5)'];
+
+function parseRatingInput(raw) {
+  const s = (raw || '').trim().toLowerCase().replace(/[^a-z0-9]/g, '');
+  const n = parseInt(s);
+  if (!isNaN(n) && n >= 1 && n <= 5) return n;
+  return RATING_WORDS[s] || null;
+}
+
+function formatRatingField(n) {
+  return n && RATING_LABELS[n] ? RATING_LABELS[n] + ' ★' : '';
+}
+
+function ratingFieldFocus() {
+  const val = document.getElementById('modalRatingVal').value;
+  document.getElementById('modalRating').value = val || '';
+}
+
+function ratingFieldBlur() {
+  const n = parseRatingInput(document.getElementById('modalRating').value);
+  if (n) {
+    document.getElementById('modalRatingVal').value = n;
+    document.getElementById('modalRating').value = formatRatingField(n);
+  } else {
+    document.getElementById('modalRating').value = formatRatingField(parseInt(document.getElementById('modalRatingVal').value)) || '';
+  }
+}
+
+function ratingFieldInput() {
+  const n = parseRatingInput(document.getElementById('modalRating').value);
+  if (n) document.getElementById('modalRatingVal').value = n;
 }
 
 function updateRatingDisplay() {
-  const rating = parseInt(document.getElementById('modalRating').value) || 0;
-  const display = document.getElementById('ratingDisplay');
-  if (rating > 0) {
-    const label = getRatingLabel(rating);
-    display.innerHTML = label;
-  } else {
-    display.innerHTML = 'No Rating';
-  }
+  // kept for backward compatibility — now a no-op
 }
 
 function openEditModal(idx) {
@@ -1436,7 +1470,8 @@ function openEditModal(idx) {
   document.getElementById('modalCategory').value = item.category || '';
   document.getElementById('modalType').value = item.type;
   document.getElementById('modalYear').value = item.year || '';
-  document.getElementById('modalRating').value = item.rating || '0';
+  document.getElementById('modalRatingVal').value = item.rating || '0';
+  document.getElementById('modalRating').value = formatRatingField(item.rating) || '';
   document.getElementById('modalUrl').value = item.url || '';
   document.getElementById('deleteBtn').style.display = 'flex';
   document.getElementById('modalOverlay').classList.add('show');
@@ -1892,7 +1927,7 @@ function saveEntry() {
   const category = document.getElementById('modalCategory').value.trim();
   const type = document.getElementById('modalType').value;
   const year = document.getElementById('modalYear').value ? parseInt(document.getElementById('modalYear').value) : null;
-  const rating = parseInt(document.getElementById('modalRating').value) || 0;
+  const rating = parseInt(document.getElementById('modalRatingVal').value) || 0;
   const url = document.getElementById('modalUrl').value.trim() || null;
 
   if (!title || !artist || !category) {

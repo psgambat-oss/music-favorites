@@ -1,5 +1,10 @@
 # My Music Library — Changelog
 
+## v2.5 — 2026-05-30
+- **Bug fix: DELETE button text now centered**
+  - Added `align-items: center` and `justify-content: center` to `.modal-btn` CSS
+  - `text-align: center` alone doesn't center text when button is displayed as flex
+
 ## v2.4 — 2026-05-29
 - **UI improvements: Section alignment and default collapse state**
   - Added explicit `justify-content: flex-start` to `.section-main` and `.sub-section-label` for consistent left alignment
