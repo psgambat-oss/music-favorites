@@ -135,21 +135,23 @@
       border: none;
       border-bottom: none;
       padding: 0 16px;
+      width: 100vw;
+      margin-left: calc(-50vw + 50%);
     }
     .filter-row::-webkit-scrollbar { display: none; }
 
     .chip {
       flex: 1;
       margin: 0 !important;
-      padding: 4px 4px !important;
+      padding: 8px 8px !important;
       border-radius: 8px;
       border: none !important;
       border-bottom: none !important;
       outline: none;
       background: var(--card2);
       color: var(--dim);
-      font-size: 11px;
-      font-weight: 600;
+      font-size: 13px;
+      font-weight: 700;
       cursor: pointer;
       display: flex !important;
       align-items: center;
@@ -198,8 +200,8 @@
 
     .section-main {
       width: 100%;
-      margin: 0 0 6px 0 !important;
-      padding: 10px 14px !important;
+      margin: 0 0 2px 0 !important;
+      padding: 6px 14px !important;
       border-radius: 12px;
       border: none !important;
       outline: none;
@@ -287,7 +289,7 @@
       border: none;
       border-radius: 6px;
       background: var(--card2);
-      color: var(--accent);
+      color: var(--accent-light);
       cursor: pointer;
       font-family: inherit;
       font-weight: 600;
@@ -314,7 +316,7 @@
       user-select: none;
     }
     .sort-toggle-item.active {
-      color: var(--accent);
+      color: var(--accent-light);
       font-weight: 600;
     }
     .sort-toggle-item.inactive {
@@ -333,12 +335,12 @@
     .music-card {
       background: transparent;
       border-radius: 0;
-      padding: 10px 14px;
+      padding: 6px 14px;
       margin-bottom: 0;
       display: flex;
       align-items: center;
       gap: 10px;
-      min-height: 44px;
+      min-height: 40px;
       cursor: pointer;
       text-decoration: none;
       color: inherit;
@@ -367,7 +369,7 @@
     .card-body { flex: 1; min-width: 0; }
 
     .card-title {
-      font-size: 14px;
+      font-size: 12px;
       font-weight: 600;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -375,10 +377,10 @@
     }
 
     .card-artist {
-      font-size: 22px;
+      font-size: 18px;
       font-weight: 500;
       color: #2596d6 !important;
-      margin-top: 2px;
+      margin-top: 0px;
       line-height: 1.3;
       display: flex;
       align-items: center;
@@ -396,7 +398,7 @@
     .no-link-indicator {
       font-size: 12px;
       font-weight: 600;
-      color: var(--gold);
+      color: var(--accent-light);
       white-space: nowrap;
       flex-shrink: 0;
     }
@@ -408,14 +410,14 @@
     }
 
     .card-meta-row {
-      font-size: 14px;
+      font-size: 12px;
       font-weight: 600;
       color: var(--dim);
-      margin-top: 2px;
+      margin-top: 0px;
       line-height: 1.3;
     }
 
-    .card-meta { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px; }
+    .card-meta { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 0px; }
     .badge {
       display: inline-block;
       font-size: 11px;
@@ -605,7 +607,7 @@
     }
     .settings-value {
       font-size: 16px;
-      color: var(--accent);
+      color: var(--accent-light);
       font-weight: 600;
     }
   </style>
@@ -1192,7 +1194,7 @@ function render() {
 
         const artistId = 'cat-artist-' + artist.replace(/\W/g, '');
         const topBadge = topArtists.includes(artist) ? '<span style="font-size:10px;color:var(--dim);white-space:nowrap;flex-shrink:0">★ TOP ARTIST</span>' : '';
-        html += `<div class="sub-section-label" style="display:flex;align-items:center;gap:8px" onclick="toggleSection('${artistId}')"><span>${esc(artist)}</span><div style="display:flex;align-items:center;gap:8px;margin-left:auto">${topBadge}</div></div>`;
+        html += `<div class="sub-section-label" style="display:flex;align-items:center;gap:8px;${activeFilter === 'all' ? '' : 'color: var(--dim)'}" onclick="toggleSection('${artistId}')"><span>${esc(artist)}</span><div style="display:flex;align-items:center;gap:8px;margin-left:auto">${topBadge}</div></div>`;
 
         const cards = sortItems(artistItems).map((item) => renderCard(item, data.indexOf(item))).join('');
         html += `<div class="section-body" id="${artistId}">${cards}</div>`;
