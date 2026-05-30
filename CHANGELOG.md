@@ -1,5 +1,35 @@
 # My Music Library — Changelog
 
+## v2.7 — 2026-05-30
+- **Card redesign: album art + new layout**
+  - Album art (46px square) replaces emoji icon — fetched from iTunes when URL is present
+  - Emoji icon fallback for playlists and entries without a URL
+  - Album title now bold, blue (#2596D6), prominent at top of card
+  - Artist name below title in white, smaller
+  - Year · ★★★★★ gray stars replace "FOUR (4) ★" text in meta row
+  - Top artist ★ badge (teal) displayed inline after artist name
+  - Edit button: teal square background, white ✎ pencil, always visible — replaces chevron
+- **Auto-fill from Apple Music URL**
+  - Paste Apple Music link into URL field → auto-populates Title, Artist, Year + stores album art
+  - Error message for non-Apple Music links
+  - Error message for no internet connection
+  - Playlist URLs show friendly message to fill manually
+- **Rating headers with star display**
+  - Show text + star ratings: "FIVE (5) ★ ★ ★ ★ ★", "FOUR (4) ★ ★ ★ ★ ☆", etc.
+  - Filled stars (★) for selected rating, outlined stars (☆) for unselected
+- **Fetch All Album Art button**
+  - Settings → "Fetch All Album Art" pulls artwork from iTunes for all entries
+  - Looks up by iTunes ID if URL present, then falls back to artist + title search
+  - Skips affirmations, hypnosis tracks, and entries already with art
+  - Shows progress and results (✓ 8 found, 2 not found)
+- **Header styling unified**
+  - ALL filter headers now use sub-section-label style (uppercase, transparent background)
+  - Consistent styling across all filter views and ALL filter
+  - Header text now white for better contrast
+  - Stars and badges keep their original dim/accent colors
+  - Same font size (16px) throughout
+  - Rating headers indented under categories in ALL filter with rating sort
+
 ## v2.5 — 2026-05-30
 - **Bug fix: DELETE button text now centered**
   - Added `align-items: center` and `justify-content: center` to `.modal-btn` CSS

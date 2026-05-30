@@ -239,10 +239,10 @@
     }
 
     .sub-section-label {
-      font-size: 15px;
+      font-size: 16px;
       font-weight: 700;
       letter-spacing: 1.5px;
-      color: var(--dim);
+      color: var(--text);
       text-transform: uppercase;
       margin: 0;
       padding: 6px 14px;
@@ -358,38 +358,47 @@
     .music-card.drag-over { background: rgba(74, 74, 74, 0.3); }
 
     .card-icon {
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
+      width: 46px;
+      height: 46px;
+      border-radius: 8px;
       background: var(--card2);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 14px;
+      font-size: 22px;
       flex-shrink: 0;
+      overflow: hidden;
+    }
+    .card-icon img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 6px;
     }
 
     .card-body { flex: 1; min-width: 0; }
 
     .card-title {
-      font-size: 12px;
-      font-weight: 600;
+      font-size: 15px;
+      font-weight: 700;
+      color: #2596D6;
       overflow: hidden;
       text-overflow: ellipsis;
+      white-space: nowrap;
       line-height: 1.3;
     }
 
     .card-artist {
-      font-size: 18px;
-      font-weight: 500;
-      color: #2596d6 !important;
-      margin-top: 0px;
+      font-size: 13px;
+      font-weight: 400;
+      color: var(--text);
+      margin-top: 2px;
       line-height: 1.3;
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      gap: 6px;
+      gap: 4px;
       min-width: 0;
+      overflow: hidden;
     }
 
     .card-artist > :first-child {
@@ -414,10 +423,13 @@
 
     .card-meta-row {
       font-size: 12px;
-      font-weight: 600;
+      font-weight: 400;
       color: var(--dim);
-      margin-top: 0px;
+      margin-top: 3px;
       line-height: 1.3;
+      display: flex;
+      align-items: center;
+      gap: 4px;
     }
 
     .card-meta { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 0px; }
@@ -481,13 +493,13 @@
     /* ── EDIT BUTTON ── */
     .card-edit-btn {
       display: flex;
-      width: 24px;
-      height: 24px;
-      border-radius: 50%;
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
       border: none;
       background: var(--accent);
-      color: var(--text);
-      font-size: 12px;
+      color: #ffffff;
+      font-size: 15px;
       cursor: pointer;
       flex-shrink: 0;
       line-height: 1;
@@ -518,6 +530,9 @@
       padding: 24px;
       width: 100%;
       max-width: 100%;
+      max-height: 88vh;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
       pointer-events: auto;
     }
     .modal h3 {
@@ -691,7 +706,9 @@
     </div>
     <div class="modal-field">
       <label>Music or Audio Link</label>
-      <input type="url" class="modal-input" id="modalUrl" placeholder="Music or audio URL" autocomplete="off">
+      <input type="url" class="modal-input" id="modalUrl" placeholder="Music or audio URL" autocomplete="off"
+        onblur="autoFillFromUrl()">
+      <div id="urlStatus" style="font-size:12px;color:var(--dim);margin-top:5px;display:none;"></div>
     </div>
     <div class="modal-actions">
       <button class="modal-btn cancel" onclick="closeModal()">Cancel</button>
@@ -758,6 +775,8 @@
           <button onclick="exportData(); return false;" style="flex:1;padding:10px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-weight:600;cursor:pointer;font-size:13px">📥 Export</button>
           <button onclick="document.getElementById('importFile').click(); return false;" style="flex:1;padding:10px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-weight:600;cursor:pointer;font-size:13px">📤 Import</button>
         </div>
+        <button onclick="fetchAllArt(); return false;" id="fetchAllBtn" style="width:100%;padding:10px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-weight:600;cursor:pointer;font-size:13px;margin-bottom:8px">🎨 Fetch All Album Art</button>
+        <div id="fetchAllStatus" style="display:none;font-size:12px;color:var(--dim);margin-bottom:10px;text-align:center;"></div>
         <button onclick="toggleHelp(); return false;" style="width:100%;padding:10px;background:var(--card);color:#999;border:none;border-radius:8px;font-weight:600;cursor:pointer;font-size:13px;margin-bottom:10px;box-shadow:0 1px 3px rgba(0,0,0,0.1)">❓ Help</button>
         <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
 
@@ -1038,35 +1057,62 @@ function getRatingLabel(rating) {
 }
 
 // ─── RENDER CARD ──────────────────────────────────────────────────────────────
+function renderGrayStars(rating) {
+  if (!rating) return '';
+  let s = '';
+  for (let i = 0; i < 5; i++) {
+    s += `<span style="color:${i < rating ? '#7a7a7a' : '#3a3a3c'}">${i < rating ? '★' : '☆'}</span>`;
+  }
+  return s;
+}
+
+function ratingHeaderStars(n) {
+  let s = '';
+  for (let i = 1; i <= 5; i++) {
+    s += `<span style="color:${i <= n ? '#7a7a7a' : '#3a3a3c'};font-size:15px;letter-spacing:2px">${i <= n ? '★' : '☆'}</span>`;
+  }
+  return s;
+}
+
+const RATING_GROUPS = [
+  { label: 'Five (5) ' + ratingHeaderStars(5), fn: i => i.rating === 5 },
+  { label: 'Four (4) ' + ratingHeaderStars(4), fn: i => i.rating === 4 },
+  { label: 'Three (3) ' + ratingHeaderStars(3), fn: i => i.rating === 3 },
+  { label: 'Two (2) ' + ratingHeaderStars(2), fn: i => i.rating === 2 },
+  { label: 'One (1) ' + ratingHeaderStars(1), fn: i => i.rating === 1 },
+  { label: 'No Rating', fn: i => i.rating === 0 },
+];
+
 function renderCard(item, idx) {
-  const icon  = item.icon || TYPE_ICON[item.type] || '🎵';
-  const link  = musicLink(item);
+  const icon = item.icon || TYPE_ICON[item.type] || '🎵';
+  const link = musicLink(item);
 
   const badges = [];
-  if (item.toReview)                badges.push('<span class="badge badge-review">Review</span>');
+  if (item.toReview) badges.push('<span class="badge badge-review">Review</span>');
 
-  const ratingHtml = `<span class="rating">${renderStars(item.rating)}</span>`;
+  // Art or emoji icon
+  const iconHtml = item.artUrl
+    ? `<div class="card-icon"><img src="${esc(item.artUrl)}" alt="" onerror="this.parentElement.innerHTML='${icon}'"></div>`
+    : `<div class="card-icon">${icon}</div>`;
 
-  const yearHtml = item.year ? `<span class="card-year">${item.year}</span>` : '';
-  const ratingLabel = getRatingLabel(item.rating);
-  const ratingTitleHtml = ratingLabel ? `<span class="card-year">${ratingLabel}</span>` : '';
+  // Year · gray stars
+  const yearPart = item.year ? `${item.year}` : '';
+  const starPart = renderGrayStars(item.rating);
+  const metaHtml = [yearPart, starPart].filter(Boolean).join(' <span style="color:#3a3a3c">·</span> ');
+
+  // Artist + top artist badge
+  const topStar = topArtists.includes(item.artist)
+    ? ' <span style="font-size:12px;color:var(--accent);opacity:0.8">★</span>' : '';
 
   const cardContent = `
-    <div class="card-icon">${icon}</div>
+    ${iconHtml}
     <div class="card-body">
-      <div class="card-title">${esc(item.special || '')}${esc(item.title)}</div>
-      <div class="card-meta-row">${yearHtml}${yearHtml && ratingTitleHtml ? '<span class="card-year"> • </span>' : ''}${ratingTitleHtml}</div>
-      <div class="card-artist">
-        ${esc(item.artist)}${topArtists.includes(item.artist) ? ' <span style="font-size:12px;color:var(--accent);margin-left:4px;opacity:0.7">★</span>' : ''}
-        ${!item.url ? '<span class="no-link-indicator">No Link</span>' : ''}
-      </div>
+      <div class="card-title">${esc(item.title)}</div>
+      <div class="card-artist"><span>${esc(item.artist)}</span>${topStar}</div>
+      <div class="card-meta-row">${metaHtml}</div>
       <div class="card-meta">${badges.join('')}</div>
     </div>
-    <button class="card-edit-btn${editMode ? ' show' : ''}" onclick="event.preventDefault(); event.stopPropagation(); openEditModal(${idx})" title="Edit">✎</button>
-    <div class="card-right">
-      ${ratingHtml}
-      <span class="chevron">›</span>
-    </div>`;
+    <button class="card-edit-btn" onclick="event.preventDefault(); event.stopPropagation(); openEditModal(${idx})" title="Edit">✎</button>`;
 
   if (editMode) {
     return `<div class="music-card" draggable="true" data-idx="${idx}" ondragstart="cardDragStart(event)" ondragend="cardDragEnd(event)" ondragover="cardDragOver(event)" ondrop="cardDrop(event)" onclick="openEditModal(${idx})">${cardContent}</div>`;
@@ -1133,23 +1179,14 @@ function render() {
 
         const artistId = 'artist-' + artist.replace(/\W/g, '');
         const topBadge = topArtists.includes(artist) ? '<span style="font-size:10px;color:var(--dim);white-space:nowrap;flex-shrink:0">★ TOP ARTIST</span>' : '';
-        html += `<div class="section-label section-main collapsed" style="display:flex;align-items:center;gap:8px" onclick="toggleSection('${artistId}')"><span class="chevron">›</span><span>${esc(artist)}</span><div style="display:flex;align-items:center;gap:8px;margin-left:auto">${topBadge}</div></div>`;
+        html += `<div class="sub-section-label collapsed" style="display:flex;align-items:center;gap:8px" onclick="toggleSection('${artistId}')"><span class="chevron">›</span><span>${esc(artist)}</span><div style="display:flex;align-items:center;gap:8px;margin-left:auto">${topBadge}</div></div>`;
 
         const cards = sortItems(artistItems).map((item) => renderCard(item, data.indexOf(item))).join('');
         html += `<div class="section-body collapsed" id="${artistId}">${cards}</div>`;
       }
     } else if (activeFilter === 'noUrl') {
       // Group by rating for No Link filter (items without URLs)
-      const ratingGroups = [
-        { label: 'Five (5) <span style="color:var(--dim)">★</span>', fn: i => i.rating === 5 },
-        { label: 'Four (4) <span style="color:var(--dim)">★</span>', fn: i => i.rating === 4 },
-        { label: 'Three (3) <span style="color:var(--dim)">★</span>', fn: i => i.rating === 3 },
-        { label: 'Two (2) <span style="color:var(--dim)">★</span>', fn: i => i.rating === 2 },
-        { label: 'One (1) <span style="color:var(--dim)">★</span>', fn: i => i.rating === 1 },
-        { label: 'No Rating', fn: i => i.rating === 0 }
-      ];
-
-      for (const rg of ratingGroups) {
+      for (const rg of RATING_GROUPS) {
         const sub = sortItems(items.filter(rg.fn));
         if (!sub.length) continue;
         const ratingId = 'nourl-rating-' + rg.label.replace(/\W/g, '');
@@ -1159,30 +1196,21 @@ function render() {
       }
     } else {
       // Group by user-created categories, then by rating within each category (for "all" with rating sort)
-      const ratingGroups = [
-        { label: 'Five (5) <span style="color:var(--dim)">★</span>', fn: i => i.rating === 5 },
-        { label: 'Four (4) <span style="color:var(--dim)">★</span>', fn: i => i.rating === 4 },
-        { label: 'Three (3) <span style="color:var(--dim)">★</span>', fn: i => i.rating === 3 },
-        { label: 'Two (2) <span style="color:var(--dim)">★</span>', fn: i => i.rating === 2 },
-        { label: 'One (1) <span style="color:var(--dim)">★</span>', fn: i => i.rating === 1 },
-        { label: 'No Rating', fn: i => i.rating === 0 }
-      ];
-
       // For each category, show items organized by rating
       for (const cat of categories) {
         const catItems = items.filter(i => i.category === cat);
         if (!catItems.length) continue;
 
         const catId = 'cat-' + cat.replace(/\W/g, '');
-        html += `<div class="section-label section-main" onclick="toggleSection('${catId}')"><span class="chevron">›</span>${esc(cat)}</div>`;
+        html += `<div class="sub-section-label" onclick="toggleSection('${catId}')"><span class="chevron">›</span>${esc(cat)}</div>`;
 
         let catContent = '';
-        for (const rg of ratingGroups) {
+        for (const rg of RATING_GROUPS) {
           const sub = sortItems(catItems.filter(rg.fn));
           if (!sub.length) continue;
           const subId = catId + '-' + rg.label.replace(/\W/g, '');
           const cards = sub.map((item) => renderCard(item, data.indexOf(item))).join('');
-          catContent += `<div class="sub-section-label collapsed" onclick="toggleSection('${subId}')"><span class="chevron">›</span>${rg.label}</div>`;
+          catContent += `<div class="sub-section-label collapsed" style="margin-left:20px" onclick="toggleSection('${subId}')"><span class="chevron">›</span>${rg.label}</div>`;
           catContent += `<div class="section-body collapsed" id="${subId}">${cards}</div>`;
         }
 
@@ -1204,23 +1232,14 @@ function render() {
 
         const artistId = 'cat-artist-' + artist.replace(/\W/g, '');
         const topBadge = topArtists.includes(artist) ? '<span style="font-size:10px;color:var(--dim);white-space:nowrap;flex-shrink:0">★ TOP ARTIST</span>' : '';
-        html += `<div class="sub-section-label collapsed" style="display:flex;align-items:center;gap:8px;${activeFilter === 'all' ? '' : 'color: var(--dim)'}" onclick="toggleSection('${artistId}')"><span class="chevron">›</span><span>${esc(artist)}</span><div style="display:flex;align-items:center;gap:8px;margin-left:auto">${topBadge}</div></div>`;
+        html += `<div class="sub-section-label collapsed" style="display:flex;align-items:center;gap:8px" onclick="toggleSection('${artistId}')"><span class="chevron">›</span><span>${esc(artist)}</span><div style="display:flex;align-items:center;gap:8px;margin-left:auto">${topBadge}</div></div>`;
 
         const cards = sortItems(artistItems).map((item) => renderCard(item, data.indexOf(item))).join('');
         html += `<div class="section-body collapsed" id="${artistId}">${cards}</div>`;
       }
     } else {
       // Group by rating within the selected category
-      const ratingGroups = [
-        { label: 'Five (5) <span style="color:var(--dim)">★</span>', fn: i => i.rating === 5 },
-        { label: 'Four (4) <span style="color:var(--dim)">★</span>', fn: i => i.rating === 4 },
-        { label: 'Three (3) <span style="color:var(--dim)">★</span>', fn: i => i.rating === 3 },
-        { label: 'Two (2) <span style="color:var(--dim)">★</span>', fn: i => i.rating === 2 },
-        { label: 'One (1) <span style="color:var(--dim)">★</span>', fn: i => i.rating === 1 },
-        { label: 'No Rating', fn: i => i.rating === 0 }
-      ];
-
-      for (const rg of ratingGroups) {
+      for (const rg of RATING_GROUPS) {
         const sub = sortItems(items.filter(rg.fn));
         if (!sub.length) continue;
         const ratingId = 'rating-' + rg.label.replace(/\W/g, '');
@@ -1417,6 +1436,8 @@ function openAddModal() {
   document.getElementById('modalRatingVal').value = '5';
   document.getElementById('modalRating').value = formatRatingField(5);
   document.getElementById('modalUrl').value = '';
+  document.getElementById('modalUrl').dataset.artUrl = '';
+  document.getElementById('urlStatus').style.display = 'none';
   document.getElementById('deleteBtn').style.display = 'none';
   document.getElementById('modalOverlay').classList.add('show');
 }
@@ -1473,6 +1494,8 @@ function openEditModal(idx) {
   document.getElementById('modalRatingVal').value = item.rating || '0';
   document.getElementById('modalRating').value = formatRatingField(item.rating) || '';
   document.getElementById('modalUrl').value = item.url || '';
+  document.getElementById('modalUrl').dataset.artUrl = item.artUrl || '';
+  document.getElementById('urlStatus').style.display = 'none';
   document.getElementById('deleteBtn').style.display = 'flex';
   document.getElementById('modalOverlay').classList.add('show');
   updateRatingDisplay();
@@ -1481,6 +1504,152 @@ function openEditModal(idx) {
 function closeModal() {
   modal = null;
   document.getElementById('modalOverlay').classList.remove('show');
+}
+
+// ─── AUTO-FILL FROM APPLE MUSIC URL ──────────────────────────────────────────
+async function autoFillFromUrl() {
+  const urlInput = document.getElementById('modalUrl');
+  const status   = document.getElementById('urlStatus');
+  const raw = urlInput.value.trim();
+  if (!raw) return;
+
+  // Only handle Apple Music URLs
+  if (!raw.includes('music.apple.com')) {
+    status.style.display = 'block';
+    status.style.color = 'var(--gold)';
+    status.textContent = 'Auto-fill only works with Apple Music links. Fill in fields manually.';
+    return;
+  }
+
+  // Extract iTunes ID — last numeric segment in the path
+  const match = raw.match(/\/(\d{7,12})(?:[?&]|$)/);
+  if (!match) {
+    status.style.display = 'block';
+    status.style.color = 'var(--gold)';
+    status.textContent = 'Could not find an album ID in this link. Fill in fields manually.';
+    return;
+  }
+
+  status.style.display = 'block';
+  status.style.color = 'var(--dim)';
+  status.textContent = 'Looking up album…';
+
+  try {
+    const res  = await fetch(`https://itunes.apple.com/lookup?id=${match[1]}`);
+    const data = await res.json();
+    const r    = data.results && data.results[0];
+
+    if (!r || r.wrapperType === 'track') {
+      // Try as collection
+      const res2  = await fetch(`https://itunes.apple.com/lookup?id=${match[1]}&entity=album`);
+      const data2 = await res2.json();
+      const r2    = data2.results && data2.results.find(x => x.wrapperType === 'collection');
+      if (r2) return applyAutoFill(r2, status);
+    }
+
+    if (r && (r.wrapperType === 'collection' || r.collectionName)) {
+      applyAutoFill(r, status);
+    } else {
+      status.style.color = 'var(--gold)';
+      status.textContent = 'This looks like a playlist — fill in fields manually.';
+    }
+  } catch(e) {
+    status.style.color = 'var(--red)';
+    status.textContent = 'No internet connection — fill in fields manually.';
+  }
+}
+
+// ─── FETCH ALL ART ───────────────────────────────────────────────────────────
+async function fetchAllArt() {
+  const btn    = document.getElementById('fetchAllBtn');
+  const status = document.getElementById('fetchAllStatus');
+
+  const targets = data.filter(item =>
+    item.type !== 'affirmation' &&
+    item.type !== 'hypnosis' &&
+    !item.artUrl
+  );
+
+  if (targets.length === 0) {
+    status.style.display = 'block';
+    status.style.color = 'var(--green)';
+    status.textContent = '✓ All entries already have album art!';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Fetching…';
+  status.style.display = 'block';
+  status.style.color = 'var(--dim)';
+
+  let found = 0, skipped = 0;
+
+  for (let i = 0; i < targets.length; i++) {
+    const item = targets[i];
+    status.textContent = `Fetching ${i + 1} of ${targets.length} — ${item.artist}…`;
+
+    try {
+      // Try URL lookup first if we have one
+      let art = null;
+      if (item.url && item.url.includes('music.apple.com')) {
+        const idMatch = item.url.match(/\/(\d{7,12})(?:[?&]|$)/);
+        if (idMatch) {
+          const r = await fetch(`https://itunes.apple.com/lookup?id=${idMatch[1]}`).then(x => x.json());
+          const result = r.results && r.results[0];
+          if (result && result.artworkUrl100) art = result.artworkUrl100.replace('100x100bb', '300x300bb');
+        }
+      }
+
+      // Fall back to search by artist + title
+      if (!art) {
+        const q = encodeURIComponent(`${item.artist} ${item.title}`);
+        const r = await fetch(`https://itunes.apple.com/search?term=${q}&entity=album&limit=1`).then(x => x.json());
+        const result = r.results && r.results[0];
+        if (result && result.artworkUrl100) art = result.artworkUrl100.replace('100x100bb', '300x300bb');
+      }
+
+      if (art) {
+        item.artUrl = art;
+        found++;
+      } else {
+        skipped++;
+      }
+    } catch(e) {
+      status.style.color = 'var(--red)';
+      status.textContent = 'No internet connection — try again when online.';
+      btn.disabled = false;
+      btn.textContent = '🎨 Fetch All Album Art';
+      return;
+    }
+
+    // Small delay to avoid rate limiting
+    await new Promise(res => setTimeout(res, 120));
+  }
+
+  saveData();
+  render();
+
+  btn.disabled = false;
+  btn.textContent = '🎨 Fetch All Album Art';
+  status.style.color = 'var(--green)';
+  status.textContent = `✓ Done — ${found} found, ${skipped} not found`;
+}
+
+function applyAutoFill(r, status) {
+  const title  = r.collectionName || '';
+  const artist = r.artistName || '';
+  const year   = r.releaseDate ? new Date(r.releaseDate).getFullYear() : '';
+  const artUrl = r.artworkUrl100 ? r.artworkUrl100.replace('100x100bb', '300x300bb') : '';
+
+  if (title  && !document.getElementById('modalTitle').value)  document.getElementById('modalTitle').value  = title;
+  if (artist && !document.getElementById('modalArtist').value) document.getElementById('modalArtist').value = artist;
+  if (year   && !document.getElementById('modalYear').value)   document.getElementById('modalYear').value   = year;
+
+  // Store artUrl for saving
+  document.getElementById('modalUrl').dataset.artUrl = artUrl;
+
+  status.style.color = 'var(--green)';
+  status.textContent = `✓ Auto-filled from iTunes${artUrl ? ' · album art saved' : ''}`;
 }
 
 function openSettingsModal() {
@@ -1928,7 +2097,8 @@ function saveEntry() {
   const type = document.getElementById('modalType').value;
   const year = document.getElementById('modalYear').value ? parseInt(document.getElementById('modalYear').value) : null;
   const rating = parseInt(document.getElementById('modalRatingVal').value) || 0;
-  const url = document.getElementById('modalUrl').value.trim() || null;
+  const url    = document.getElementById('modalUrl').value.trim() || null;
+  const artUrl = document.getElementById('modalUrl').dataset.artUrl || null;
 
   if (!title || !artist || !category) {
     alert('Title, artist, and category are required');
@@ -1946,6 +2116,7 @@ function saveEntry() {
       toReview: false
     };
     if (url) newItem.url = url;
+    if (artUrl) newItem.artUrl = artUrl;
     data.push(newItem);
   } else {
     const item = data[modal.idx];
@@ -1957,6 +2128,8 @@ function saveEntry() {
     item.rating = rating;
     if (url) item.url = url;
     else delete item.url;
+    if (artUrl) item.artUrl = artUrl;
+    else if (!artUrl && !item.artUrl) delete item.artUrl;
   }
 
   saveData();
