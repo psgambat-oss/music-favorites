@@ -1,5 +1,18 @@
 # My Music Library — Changelog
 
+## v2.3 — 2026-05-29
+- **UI refinement: Left-aligned chevron indicators**
+  - Moved chevron icons (›) to left side of all expandable headers for more conventional UI pattern
+  - Applied to category headers, rating sub-headers, and artist headers
+  - Improves visual consistency and makes expandable sections more obvious
+- **CSS spacing improvements**
+  - Updated `.section-main` to use `gap: 8px` instead of `justify-content: space-between`
+  - Added `gap: 8px` to `.sub-section-label` for proper chevron-content spacing
+  - Maintains visual hierarchy and readability
+- **Bug fix**
+  - Fixed missing chevron in category rating headers (catContent rendering path)
+  - Ensures consistent visual presentation across all view modes
+
 ## v2.2 — 2026-05-25
 - **Card layout redesign**
   - Reorganized card display: Title, Year • Rating, Artist on separate rows
